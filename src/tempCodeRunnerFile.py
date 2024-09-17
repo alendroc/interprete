@@ -1,0 +1,1 @@
+    # Obtener las dimensiones actuales de la ventana principal

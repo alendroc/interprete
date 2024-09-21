@@ -38,7 +38,13 @@ keywords = {
     'ESPACIOS': r'\s',
     'SALTO_LINEA': r'\t',           #salto de linea
     'ID': r'[a-zA-Z_][a-zA-Z0-9_]*',  # Identificadores
-
+    
+    'LLAMAR_IMPRIMIR': r'\$IMPRIMIR', 
+    'LLAMAR_CONCATENAR_CADENAS': r'\$CONCATENAR',
+    'LLAMAR_NUM_ALEATORIO': r'\$ALEATORIO',
+    'LLAMAR_OBTENER_FECHA_ACTUAL': r'\$OBTENER_FECHA',
+    'LLAMAR_CONTAR_VOCALES': r'\$CONT_VOCALES',  
+    'LLAMAR_PONTENCIA': r'\$POTENCIA'
     }
 
 
@@ -65,17 +71,19 @@ class analisisLexico:
             else:
                 print(f"(Carácter no reconocido: {tex[pos]})")
                 pos += 1 
-        for token in self.tokens:
-            print(token)
+       
 
-prueba= """num numeros = 90:
-si
-cadena texto = "texto":
-sino
+prueba= """num n = "verdadero":
+num n2 = 20:
+$IMPRIMIR(36)
+$CONCATENAR("Hola" "Mundo")
 """
-#print(splitFinal(prueba))
 
-analisisLexico().tokenizar(prueba)
+#print(splitFinal(prueba))
+lexico = analisisLexico()
+lexico.tokenizar(prueba)
+for token in lexico.tokens:
+    print("TOKENS DE LA CADENA: ",token)
 
 
 

@@ -1,12 +1,14 @@
-from lexico import analisisLexico as lex
+from lexico import AnalisisLexico as lex
+from semantico import AnalisisSemantico as sem
 
-class analisisSintactico:
+class AnalisisSintactico:
     def __init__(self,tokens):
         self.tokens = tokens
         self.pos=0
         self.tokenActual= tokens[0] if tokens else None
         self.variables = {}
         self.linea=1
+        self.analisisSemantico=sem(self.variables)
         
     def consumirToken(self, token):
         if self.tokenActual and self.tokenActual[0] == token:
@@ -42,41 +44,25 @@ class analisisSintactico:
         self.consumirToken('ID')
         self.consumirToken('ASIGNAR')
 
-#NO SÉ SI VA EN SEMANTICO
-
         if tipo =="NUM":
             valorExpresion = self.expresionesAritm()
-            if not isinstance(valorExpresion,(int, float)):
-                print(f"Error: Asignación de valor incompatible a una variable de tipo NUM en '{nombreVariable}'")
-                return
-            
-        elif tipo == "SIM":
-            valorExpresion = self.analizarVariables()
-            if not isinstance(valorExpresion, str) or len(valorExpresion) != 1:
-                print(f"Error: Asignación de valor incompatible a una variable de tipo SIM en '{nombreVariable}'")
-                return
-            
-        elif tipo == "CADENA":
-            valorExpresion = self.analizarVariables()
-            if not isinstance(valorExpresion, str):
-                print(f"Error: Asignación de valor incompatible a una variable de tipo CADENA en '{nombreVariable}'")
-                return
-            
-        elif tipo == "BOOL":
-            valorExpresion = self.analizarVariables()
-            if not isinstance(valorExpresion, bool):
-                if valorExpresion == 1:
-                    valorExpresion = True
-                elif valorExpresion == 0:
-                    valorExpresion = False
-                else:
-                    print(f"Error: Asignación de valor incompatible a una variable de tipo BOOL en '{nombreVariable}'")
-                    return
-#TERMINA
+        else:
+            valorExpresion=self.analizarVariables()
 
-        self.consumirToken('FIN_LINEA')
-        self.variables[nombreVariable] = valorExpresion
-        print(f"Declaración de {tipo} {nombreVariable} = {valorExpresion}")
+#VERIFICAR QUE LAS VARIABLES TENGAN EL TIPO DE DATO CORRECTO
+        validar,error=self.analisisSemantico.verificarCompatibilidad(tipo,valorExpresion)
+
+        if validar:
+            self.variables[nombreVariable] = valorExpresion
+            print(f"Declaración de {tipo} {nombreVariable} = {valorExpresion}")
+        else:
+            print(error)
+
+        if self.tokenActual and self.tokenActual[0] == 'FIN_LINEA':
+            self.consumirToken('FIN_LINEA')
+        else:
+            print(f"Error sintáctico: Se esperaba 'FIN_LINEA' pero se encontró {self.tokenActual}")
+
 
 #EXPRESIONES ARITMETICAS PARA ASIGNAR NUMEROS
     def expresionesAritm(self):
@@ -142,14 +128,14 @@ class analisisSintactico:
 #FIN DECLARACIONES DE VARIABLES
 
 prueba= """num n = (90 + 20 -10) / 2*2:
-bool n2 = falso:
-sim n3 = '@':
+bool n2 = 0:
+sim n3 = 'm':
 """
 
 
 le=lex()
 le.tokenizar(prueba)
-aS=analisisSintactico(le.tokens)
+aS=AnalisisSintactico(le.tokens)
 
 while aS.tokenActual:
     aS.declararTipoDato()

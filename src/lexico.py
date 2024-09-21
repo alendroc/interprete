@@ -48,7 +48,7 @@ keywords = {
     }
 
 
-class analisisLexico:
+class AnalisisLexico:
     def __init__(self):
         self.tokens = []
 
@@ -79,18 +79,18 @@ class analisisLexico:
                 pos += 1 
        
 
-prueba= """num n = "verdadero":
-num n2 = 20:
-sim m = 'ca':
-$IMPRIMIR(36):
-$CONCATENAR("Hola" "Mundo"):
-"""
+# prueba= """num n = "verdadero":
+# num n2 = 20:
+# sim m = 'ca':
+# $IMPRIMIR(36):
+# $CONCATENAR("Hola" "Mundo"):
+# """
 
-# print(splitFinal(prueba))
-lexico = analisisLexico()
-lexico.tokenizar(prueba)
-for token in lexico.tokens:
-    print("TOKENS DE LA CADENA: ",token)
+# # print(splitFinal(prueba))
+# lexico = AnalisisLexico()
+# lexico.tokenizar(prueba)
+# for token in lexico.tokens:
+#     print("TOKENS DE LA CADENA: ",token)
 
 
 

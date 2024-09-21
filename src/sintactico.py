@@ -24,7 +24,7 @@ class analisisSintactico:
 
 #DECLARACIONES DE VARIABLES
     def declararTipoDato(self):
-        if self.tokenActual[0] in ['NUM', 'DEC', 'SIM', 'CADENA', 'BOOL', 'NULO']:
+        if self.tokenActual[0] in ['NUM', 'SIM', 'CADENA', 'BOOL']:
             self.declaraciones()
         else:
             print(f"Error sintáctico: Declaración inesperada en {self.tokenActual}")
@@ -35,6 +35,10 @@ class analisisSintactico:
         tipo = self.tokenActual[0]
         self.consumirToken(tipo)
         nombreVariable = self.tokenActual[1]
+        if nombreVariable in self.variables:
+            print(f"variable {nombreVariable} ya antes mencionada")
+            self.tokenActual = None
+            return
         self.consumirToken('ID')
         self.consumirToken('ASIGNAR')
         valorExpresion = self.expresionesAritm()
@@ -74,13 +78,25 @@ class analisisSintactico:
                 result = self.expresionesAritm()
                 self.consumirToken('PARENTESIS_D')
                 return result
-            return self.analizarNumAndVariable()
+            return self.analizarVariables()
 
-    def analizarNumAndVariable(self):
+    def analizarVariables(self):
         token = self.tokenActual
         if token[0] == 'NUMERO':
             self.consumirToken('NUMERO')
             return float(token[1])
+        elif token[0] == 'TEXTO':
+            self.consumirToken('TEXTO')
+            return str(token[1])
+        elif token[0] == 'CAR':
+            self.consumirToken('CAR')
+            return chr(token[1])
+        elif token[0] == 'VERDADERO':
+            self.consumirToken('VERDADERO')
+            return True
+        elif token[0] == 'FALSO':
+            self.consumirToken('FALSO')
+            return False
         elif token[0] == 'ID':
             nombreVariable = token[1]
             self.consumirToken('ID')
@@ -92,8 +108,10 @@ class analisisSintactico:
 #FIN DECLARACIONES DE VARIABLES
 
 
-prueba= """num n = (90 + 20 -10) / 2*2:
-num n2 = 20:
+prueba= """num n = (90.6 + 20 -10) / 2*2:
+num n3 = 20:
+sim n2 = 'h':
+bool n3 = verdadero:
 """
 
 

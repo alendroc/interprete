@@ -36,7 +36,7 @@ keywords = {
     'SI': r'\bsi\b',            # si simula el if
     'SINO': r'\bsino\b',          # sino simula el else
     'ESPACIOS': r'\s',
-    'SALTO_LINEA': r'\t',           #salto de linea
+    'SALTO_LINEA': r'\n',           #salto de linea
     'ID': r'[a-zA-Z_][a-zA-Z0-9_]*',  # Identificadores
     
     'LLAMAR_IMPRIMIR': r'\$IMPRIMIR', 
@@ -65,6 +65,12 @@ class analisisLexico:
             if match:
                 token_type=match.lastgroup
                 token_value = match.group()
+
+                if token_type == 'CAR' and len(token_value) != 3:
+                     print(f"Error: El carácter '{token_value}' no es válido. Se esperaba un solo carácter.")
+                     pos += len(token_value)
+                     continue
+
                 if token_type != 'ESPACIOS':
                     self.insert(token_type, token_value)    
                 pos += len(token_value)  
@@ -75,16 +81,16 @@ class analisisLexico:
 
 prueba= """num n = "verdadero":
 num n2 = 20:
-$IMPRIMIR(36)
-$CONCATENAR("Hola" "Mundo")
+sim m = 'ca':
+$IMPRIMIR(36):
+$CONCATENAR("Hola" "Mundo"):
 """
 
-#print(splitFinal(prueba))
+# print(splitFinal(prueba))
 lexico = analisisLexico()
 lexico.tokenizar(prueba)
 for token in lexico.tokens:
     print("TOKENS DE LA CADENA: ",token)
-
 
 
 

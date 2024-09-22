@@ -167,31 +167,37 @@ class AnalisisSintactico:
             print('Token inesperado al asignar valor -> Linea: {self.linea}')
             return None
     
+    def sintaxis_Funcion_Imprimir(self):
+         self.consumirToken('LLAMAR_IMPRIMIR')
+         self.consumirToken('PARENTESIS_I')
+         ID =self.tokenActual[1]
+         self.consumirToken('ID')
+         self.consumirToken('PARENTESIS_D')
+         self.consumirToken('FIN_LINEA')
+         if ID in self.variables:
+          valor = self.variables[ID]
+          print(f"-> {valor}")
+
+    def sintaxis_funcion_Numero_Aleatorio(self):
+        self.consumirToken('LLAMAR_NUM_ALEATORIO')
+        self.consumirToken('PARENTESIS_I')
+        rango1 = self.analizarVariables() 
+        self.consumirToken('SEPARADOR')  
+        rangoFinal = self.analizarVariables()  
+        self.consumirToken('PARENTESIS_D')  
+        self.consumirToken('FIN_LINEA')
+        if isinstance(rango1, (int, float)) and isinstance(rangoFinal, (int, float)):
+         ranNum = random.randint(int(rango1), int(rangoFinal))
+         print(f"rand -> {ranNum}")
+        else:
+         print(f"error al generar número aleatorio: rangos inválidos")
+
     def definirComando(self):
        token = self.tokenActual 
        if token[0] == 'LLAMAR_IMPRIMIR':
-           self.consumirToken('LLAMAR_IMPRIMIR')
-           self.consumirToken('PARENTESIS_I')
-           ID =self.tokenActual[1]
-           self.consumirToken('ID')
-           self.consumirToken('PARENTESIS_D')
-           self.consumirToken('FIN_LINEA')
-           if ID in self.variables:
-            valor = self.variables[ID]
-            print(f"-> {valor}")
+          self.sintaxis_Funcion_Imprimir()
        elif self.tokenActual[0] == 'LLAMAR_NUM_ALEATORIO':
-            self.consumirToken('LLAMAR_NUM_ALEATORIO')
-            self.consumirToken('PARENTESIS_I')
-            rango1 = self.analizarVariables() 
-            self.consumirToken('SEPARADOR')  
-            rangoFinal = self.analizarVariables()  
-            self.consumirToken('PARENTESIS_D')  
-            self.consumirToken('FIN_LINEA')
-            if isinstance(rango1, (int, float)) and isinstance(rangoFinal, (int, float)):
-              ranNum = random.randint(int(rango1), int(rangoFinal))
-              print(f"rand -> {ranNum}")
-            else:
-             print(f"error al generar número aleatorio: rangos inválidos")
+           self.sintaxis_funcion_Numero_Aleatorio
        #elif FUNCION OPTENER FECHA ACTUAL, DANIEL
        else:
             print(f"Error sintáctico: Comando inesperado {self.tokenActual}")
@@ -208,9 +214,10 @@ class AnalisisSintactico:
 prueba = """num n = (90 + 20 - 10) / 2 * 2:
 num n2 = n + n*2:
 sim n3 = 'm':
+$IMPRIMIR (n2):
 """
-# $IMPRIMIR (n2):
-# $ALEATORIO (1 , 10):
+# 
+# 
 # """
 
 

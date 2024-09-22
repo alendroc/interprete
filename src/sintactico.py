@@ -138,6 +138,7 @@ class AnalisisSintactico:
 
 #DEVUELVE EL VALOR DE LA VARIABLE
     def analizarVariables(self):
+        self.analisisSemantico.linea=self.linea
         token = self.tokenActual
         if token[0] == 'NUMERO':
             self.consumirToken('NUMERO')
@@ -157,7 +158,11 @@ class AnalisisSintactico:
         elif token[0] == 'ID':
             nombreVariable = token[1]
             self.consumirToken('ID')
-            return nombreVariable
+            validar, error=self.analisisSemantico.verificarDeclaracion(nombreVariable)
+            if not validar:
+                print(error)
+                return None
+            return self.variables[nombreVariable]
         else:
             print('Token inesperado al asignar valor -> Linea: {self.linea}')
             return None
@@ -200,8 +205,8 @@ class AnalisisSintactico:
 
 #FIN DECLARACIONES DE VARIABLES
 
-prueba = """num n = (90 + 20 - 10) / 2 * 2 :
-bool n2 = 1:
+prueba = """num n = (90 + 20 - 10) / 2 * 2:
+num n2 = n + e:
 sim n3 = 'm':
 """
 # $IMPRIMIR (n2):

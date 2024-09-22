@@ -27,7 +27,6 @@ class AnalisisSemantico:
 
 
     def verificarNumero(self, valor):
-       
         if not isinstance(valor, (int, float)):
             return False,f"Error semántico: Se esperaba un número, pero se encontró '{valor}' -> Linea: {self.linea}"
         return True,None
@@ -36,7 +35,7 @@ class AnalisisSemantico:
 
     def verificarDeclaracion(self, nombreVariable):
         if nombreVariable not in self.variables:
-            return False, f"Error semántico: La variable '{nombreVariable}' no ha sido declarada."
+            return False, f"Error semántico: La variable '{nombreVariable}' no ha sido declarada -> Linea: {self.linea}"
         return True, None
 
     def verificarCompatibilidad(self, tipoVariable, valorAsignado):

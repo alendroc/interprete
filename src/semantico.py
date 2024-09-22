@@ -2,8 +2,10 @@ class AnalisisSemantico:
     def __init__(self, variables):
         self.variables = variables
 
-    def verificarTipo(self, tipo, valor):
+    def verificarTipoVar(self, tipo, valor):
         if tipo == "NUM":
+            if isinstance(valor, bool):
+                return False, f"Error semántico: Se esperaba un número, pero se encontró '{valor}'"
             if not isinstance(valor, (int, float)):
                 return False, f"Error semántico: Se esperaba un número, pero se encontró '{valor}'"
         elif tipo == "SIM":
@@ -20,6 +22,17 @@ class AnalisisSemantico:
                     return True, None
                 return False, f"Error semántico: Se esperaba un valor booleano, pero se encontró '{valor}'"
         return True, None
+    
+
+
+    def verificarNumero(self, valor):
+        if valor is None:
+            return False, "Error semántico: Se encontró un valor nulo (None)"
+        if not isinstance(valor, (int, float)):
+            return False,f"Error semántico: Se esperaba un número, pero se encontró '{valor}'"
+        return True,None
+
+
 
     def verificarDeclaracion(self, nombreVariable):
         if nombreVariable not in self.variables:
@@ -27,7 +40,10 @@ class AnalisisSemantico:
         return True, None
 
     def verificarCompatibilidad(self, tipoVariable, valorAsignado):
-        valido, error = self.verificarTipo(tipoVariable, valorAsignado)
+        valido, error = self.verificarTipoVar(tipoVariable, valorAsignado)
+       
+        # print(f"VARIABLE: {tipoVariable}, VALOR: {valorAsignado}" )
+        
         if not valido:
             return False, error
         return True, None

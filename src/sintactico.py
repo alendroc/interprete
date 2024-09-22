@@ -6,15 +6,14 @@ class AnalisisSintactico:
     def __init__(self,tokens):
         self.tokens = tokens
         self.pos=0
-        self.tokenActual= tokens[0] if tokens else None
         self.variables = {}
         self.linea=1
+        self.tokenActual= tokens[0] if tokens else None
         self.analisisSemantico=sem(self.variables)
         
     def consumirToken(self, token):
         if self.tokenActual and self.tokenActual[0] == token:
             self.pos += 1
-            #print(self.tokenActual)
             if self.pos < len(self.tokens):
                 self.tokenActual = self.tokens[self.pos]
 
@@ -47,6 +46,7 @@ class AnalisisSintactico:
 
         if tipo =="NUM":
             valorExpresion = self.expresionesAritm()
+            #print("valor numero: ",valorExpresion)
         else:
             valorExpresion=self.analizarVariables()
 
@@ -101,6 +101,7 @@ class AnalisisSintactico:
     
 #FIN DE ASIGNACION DE NUMEROS
 
+#DEVUELVE EL VALOR DE LA VARIABLE
     def analizarVariables(self):
         token = self.tokenActual
         if token[0] == 'NUMERO':
@@ -164,12 +165,13 @@ class AnalisisSintactico:
 
 #FIN DECLARACIONES DE VARIABLES
 
-prueba = """num n = (90 + 20 - 10) / 2 * 2:
-bool n2 = 0:
+prueba = """num n = (90 + 20 - 10) / 2 * 2 :
+num n2 = 5*(2+1):
 sim n3 = 'm':
-$IMPRIMIR (n):
-$ALEATORIO (1 , 10):
 """
+# $IMPRIMIR (n2):
+# $ALEATORIO (1 , 10):
+# """
 
 
 le=lex()
@@ -181,4 +183,12 @@ while aS.tokenActual:
     if not aS.tokenActual:  # Si no hay más tokens, salir del bucle
         break
 
-#HAY COSAS QUE HAY QUE PASARLAS AL ANALISIS SEMANTICO COMO LAS VALIDACIONES DE TIPOS Y VERIFICAR DECLARACIONES
+# for v in aS.variables:
+#     print("VARIABLE: ",v)
+#print(aS.variables)
+
+# for nombreVariable, valor in aS.variables.items():
+#     print(valor)
+
+# for valor in aS.variables.items():
+#     print(valor)

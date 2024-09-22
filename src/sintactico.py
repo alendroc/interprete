@@ -1,5 +1,6 @@
 from lexico import AnalisisLexico as lex
 from semantico import AnalisisSemantico as sem
+import random
 
 class AnalisisSintactico:
     def __init__(self,tokens):
@@ -124,19 +125,57 @@ class AnalisisSintactico:
         else:
             print('Token inesperado al asignar valor')
             return None
-        
+    
+    def definirComando(self):
+       token = self.tokenActual 
+       if token[0] == 'LLAMAR_IMPRIMIR':
+           self.consumirToken('LLAMAR_IMPRIMIR')
+           self.consumirToken('PARENTESIS_I')
+           ID =self.tokenActual[1]
+           self.consumirToken('ID')
+           self.consumirToken('PARENTESIS_D')
+           self.consumirToken('FIN_LINEA')
+           if ID in self.variables:
+            valor = self.variables[ID]
+            print(f"-> {valor}")
+       elif self.tokenActual[0] == 'LLAMAR_NUM_ALEATORIO':
+            self.consumirToken('LLAMAR_NUM_ALEATORIO')
+            self.consumirToken('PARENTESIS_I')
+            rango1 = self.analizarVariables() 
+            self.consumirToken('SEPARADOR')  
+            rangoFinal = self.analizarVariables()  
+            self.consumirToken('PARENTESIS_D')  
+            self.consumirToken('FIN_LINEA')
+            if isinstance(rango1, (int, float)) and isinstance(rangoFinal, (int, float)):
+              ranNum = random.randint(int(rango1), int(rangoFinal))
+              print(f"rand -> {ranNum}")
+            else:
+             print(f"error al generar número aleatorio: rangos inválidos")
+       #elif FUNCION OPTENER FECHA ACTUAL, DANIEL
+       else:
+            print(f"Error sintáctico: Comando inesperado {self.tokenActual}")
+
+    def procesarTokens(self):
+     while self.tokenActual:
+        if self.tokenActual[0] in ['LLAMAR_IMPRIMIR', 'LLAMAR_NUM_ALEATORIO']:
+           self.definirComando()
+        else:
+           self.declararTipoDato() 
+
 #FIN DECLARACIONES DE VARIABLES
 
-prueba= """num n = (90 + 20 -10) / 2*2:
+prueba = """num n = (90 + 20 - 10) / 2 * 2:
 bool n2 = 0:
 sim n3 = 'm':
+$IMPRIMIR (n):
+$ALEATORIO (1 , 10):
 """
 
 
 le=lex()
 le.tokenizar(prueba)
 aS=AnalisisSintactico(le.tokens)
-
+aS.procesarTokens()
 while aS.tokenActual:
     aS.declararTipoDato()
     if not aS.tokenActual:  # Si no hay más tokens, salir del bucle

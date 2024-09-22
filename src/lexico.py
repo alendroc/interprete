@@ -32,13 +32,13 @@ keywords = {
     'VERDADERO': r'\bverdadero\b|\b1\b',
     'FALSO': r'\bfalso\b|\b0\b',
     'TEXTO': r'"[^"]*"',        # Strings entre comillas
-  'CAR': r"'(.)'",              # Caracter
+    'CAR': r"'(.)'",              # Caracter
     'SI': r'\bsi\b',            # si simula el if
     'SINO': r'\bsino\b',          # sino simula el else
     'ESPACIOS': r'\s',
     'SALTO_LINEA': r'\n',           #salto de linea
     'ID': r'[a-zA-Z_][a-zA-Z0-9_]*',  # Identificadores
-    
+    'SEPARADOR': r'[,]',
     'LLAMAR_IMPRIMIR': r'\$IMPRIMIR', 
     'LLAMAR_CONCATENAR_CADENAS': r'\$CONCATENAR',
     'LLAMAR_NUM_ALEATORIO': r'\$ALEATORIO',

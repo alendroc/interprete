@@ -9,7 +9,7 @@ class AnalisisSintactico:
         self.variables = {}
         self.linea=1
         self.tokenActual= tokens[0] if tokens else None
-        self.analisisSemantico=sem(self.variables)
+        self.analisisSemantico=sem(self.variables,self.linea)
         
     def consumirToken(self, token):
         if self.tokenActual and self.tokenActual[0] == token:
@@ -20,7 +20,7 @@ class AnalisisSintactico:
             else:
                 self.tokenActual = None
         else:
-            print(f"Error sintáctico: Se esperaba {token}, pero se encontró {self.tokenActual}")
+            print(f"Error sintáctico: Se esperaba {token}, pero se encontró {self.tokenActual} -> Linea: {self.linea}")
            
 
 
@@ -29,7 +29,7 @@ class AnalisisSintactico:
         if self.tokenActual[0] in ['NUM', 'SIM', 'CADENA', 'BOOL']:
             self.declaraciones()
         else:
-            print(f"Error sintáctico: Declaración inesperada en {self.tokenActual}")
+            print(f"Error sintáctico: Declaración inesperada en {self.tokenActual} -> Linea: {self.linea}")
             self.tokenActual = None
 
 
@@ -51,6 +51,7 @@ class AnalisisSintactico:
             valorExpresion=self.analizarVariables()
 
 #VERIFICAR QUE LAS VARIABLES TENGAN EL TIPO DE DATO CORRECTO
+        self.analisisSemantico.linea=self.linea
         validar,error=self.analisisSemantico.verificarCompatibilidad(tipo,valorExpresion)
 
         if validar:
@@ -61,33 +62,67 @@ class AnalisisSintactico:
 
         if self.tokenActual and self.tokenActual[0] == 'FIN_LINEA':
             self.consumirToken('FIN_LINEA')
+            self.linea+=1
         else:
-            print(f"Error sintáctico: Se esperaba 'FIN_LINEA' pero se encontró {self.tokenActual}")
+            print(f"Error sintáctico: Se esperaba 'FIN_LINEA' pero se encontró {self.tokenActual} -> Linea: {self.linea}")
 
 
 #EXPRESIONES ARITMETICAS PARA ASIGNAR NUMEROS
     def expresionesAritm(self):
         result = self.multiplicacionDivision()
+        # validar, error = self.analisisSemantico.verificarNumero(result)
+        # if not validar:
+        #     print(error)
+        #     return None
+        
         while self.tokenActual and self.tokenActual[0] in ['SUMA', 'RESTA']:
             token = self.tokenActual
             if token[0] == 'SUMA':
                 self.consumirToken('SUMA')
-                result += self.multiplicacionDivision()
+                siguienteValor = self.multiplicacionDivision()
+                validar, error = self.analisisSemantico.verificarNumero(siguienteValor)
+                if not validar:
+                    print(error)
+                    return None
+                result += siguienteValor
             elif token[0] == 'RESTA':
                 self.consumirToken('RESTA')
-                result -= self.multiplicacionDivision()
+                siguienteValor = self.multiplicacionDivision()
+                validar, error = self.analisisSemantico.verificarNumero(siguienteValor)
+                if not validar:
+                    print(error)
+                    return None
+                result -= siguienteValor
         return result
 
     def multiplicacionDivision(self):
         result = self.asignarParentesis()
+        # validar, error = self.analisisSemantico.verificarNumero(result)
+        # if not validar:
+        #     print(error)
+        #     return None
+        
         while self.tokenActual and self.tokenActual[0] in ['MULT', 'DIV']:
             token = self.tokenActual
             if token[0] == 'MULT':
                 self.consumirToken('MULT')
-                result *= self.asignarParentesis()
+                siguienteValor = self.asignarParentesis()
+                validar, error = self.analisisSemantico.verificarNumero(siguienteValor)
+                if not validar:
+                    print(error)
+                    return None
+                result *= siguienteValor
+
+                #result *= self.asignarParentesis()
             elif token[0] == 'DIV':
                 self.consumirToken('DIV')
-                result /= self.asignarParentesis()
+                siguienteValor = self.asignarParentesis()
+                validar, error = self.analisisSemantico.verificarNumero(siguienteValor)
+                if not validar:
+                    print(error)
+                    return None
+                result /= siguienteValor
+                #result /= self.asignarParentesis()
         return result
     
 
@@ -124,7 +159,7 @@ class AnalisisSintactico:
             self.consumirToken('ID')
             return nombreVariable
         else:
-            print('Token inesperado al asignar valor')
+            print('Token inesperado al asignar valor -> Linea: {self.linea}')
             return None
     
     def definirComando(self):
@@ -166,7 +201,7 @@ class AnalisisSintactico:
 #FIN DECLARACIONES DE VARIABLES
 
 prueba = """num n = (90 + 20 - 10) / 2 * 2 :
-num n2 = 5*(2+1):
+bool n2 = 1:
 sim n3 = 'm':
 """
 # $IMPRIMIR (n2):

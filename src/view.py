@@ -1,5 +1,17 @@
 from tkinter import *
 
+#-----------------------------Eventos-----------------------------
+
+def onEjecEvent():
+    print("Hola")
+
+
+def onCompileEvent():
+    consoleTxt.config(state=NORMAL)
+    consoleTxt.insert(1.0, "Hola Mundo")
+    consoleTxt.config(state=DISABLED)
+
+
 #-----------------------------Variables-----------------------------
 
 mainWd = Tk()
@@ -31,8 +43,8 @@ separatorFr = Frame(mainFr, bg="#b0b0b0", height=2)
 
 # Botones Run y Stop
 
-ejecBtn = Button(debuggerFr, text="Ejecutar")
-compBtn = Button(debuggerFr, text="Compilar")
+ejecBtn = Button(debuggerFr, text="Ejecutar", command=onEjecEvent)
+compBtn = Button(debuggerFr, text="Compilar", command=onCompileEvent)
 
 #-----------------------------Posicionamiento-----------------------------
 
@@ -93,7 +105,7 @@ codeTxt.config(width=300, height=300)
 codeTxt.grid(column=0, row=0, padx=10, pady=10)
 codeScroll.grid(column=1, row=0)
 
-#-----------------------------Eventos-----------------------------
+#-----------------------------Ejecución-----------------------------
 
 mainWd.bind('<Configure>', resize)
 

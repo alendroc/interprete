@@ -67,7 +67,7 @@ class AnalisisLexico:
                 token_value = match.group()
 
                 if token_type == 'CAR' and len(token_value) != 3:
-                     print(f"Error: El carácter '{token_value}' no es válido. Se esperaba un solo carácter.")
+                     print(f"Error léxico: El carácter '{token_value}' no es válido. Se esperaba un solo carácter.")
                      pos += len(token_value)
                      continue
 
@@ -75,7 +75,7 @@ class AnalisisLexico:
                     self.insert(token_type, token_value)    
                 pos += len(token_value)  
             else:
-                print(f"(Carácter no reconocido: {tex[pos]})")
+                print(f"Error léxico: Carácter no reconocido: {tex[pos]}")
                 pos += 1 
        
 

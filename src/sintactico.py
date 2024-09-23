@@ -7,9 +7,11 @@ class AnalisisSintactico:
         self.tokens = tokens
         self.pos=0
         self.variables = {}
+        self.errores=[]
         self.linea=1
         self.tokenActual= tokens[0] if tokens else None
         self.analisisSemantico=sem(self.variables,self.linea)
+        self.modoCompilacion=False
         
     def consumirToken(self, token):
         if self.tokenActual and self.tokenActual[0] == token:
@@ -20,25 +22,32 @@ class AnalisisSintactico:
             else:
                 self.tokenActual = None
         else:
-            print(f"Error sintáctico: Se esperaba {token}, pero se encontró {self.tokenActual} -> Linea: {self.linea}")
+            self.errores.append(f"Error sintáctico: Se esperaba {token}, pero se encontró {self.tokenActual} -> Linea: {self.linea}")
+            #print(f"Error sintáctico: Se esperaba {token}, pero se encontró {self.tokenActual} -> Linea: {self.linea}")
            
 
 
 #DECLARACIONES DE VARIABLES
     def declararTipoDato(self):
+
         if self.tokenActual[0] in ['NUM', 'SIM', 'CADENA', 'BOOL']:
             self.declaraciones()
         else:
-            print(f"Error sintáctico: Declaración inesperada en {self.tokenActual} -> Linea: {self.linea}")
+            self.errores.append(f"Error sintáctico: Declaración inesperada en {self.tokenActual} -> Linea: {self.linea}")
+            #print(f"Error sintáctico: Declaración inesperada en {self.tokenActual} -> Linea: {self.linea}")
             self.tokenActual = None
+
+        
 
 
     def declaraciones(self):
+        
         tipo = self.tokenActual[0]
         self.consumirToken(tipo)
         nombreVariable = self.tokenActual[1]
         if nombreVariable in self.variables:
-            print(f"variable {nombreVariable} ya antes declarada")
+            self.errores.append(f"variable {nombreVariable} ya antes declarada")
+            #print(f"variable {nombreVariable} ya antes declarada")
             self.tokenActual = None
             return
         self.consumirToken('ID')
@@ -56,15 +65,20 @@ class AnalisisSintactico:
 
         if validar:
             self.variables[nombreVariable] = valorExpresion
-            print(f"Declaración de {tipo} {nombreVariable} = {valorExpresion}")
+            #self.errores.append(f"Declaración de {tipo} {nombreVariable} = {valorExpresion}")
+            if self.modoCompilacion:
+                print(f"Declaración de {tipo} {nombreVariable} = {valorExpresion}")
         else:
-            print(error)
+            self.errores.append(error)
+            #print(error)
 
         if self.tokenActual and self.tokenActual[0] == 'FIN_LINEA':
             self.consumirToken('FIN_LINEA')
             self.linea+=1
         else:
-            print(f"Error sintáctico: Se esperaba 'FIN_LINEA' pero se encontró {self.tokenActual} -> Linea: {self.linea}")
+            self.errores.append(f"Error sintáctico: Se esperaba 'FIN_LINEA' pero se encontró {self.tokenActual} -> Linea: {self.linea}")
+            #print(f"Error sintáctico: Se esperaba 'FIN_LINEA' pero se encontró {self.tokenActual} -> Linea: {self.linea}")
+      
 
 
 #EXPRESIONES ARITMETICAS PARA ASIGNAR NUMEROS
@@ -82,7 +96,8 @@ class AnalisisSintactico:
                 siguienteValor = self.multiplicacionDivision()
                 validar, error = self.analisisSemantico.verificarNumero(siguienteValor)
                 if not validar:
-                    print(error)
+                    self.errores.append(error)
+                    #print(error)
                     return None
                 result += siguienteValor
             elif token[0] == 'RESTA':
@@ -90,7 +105,8 @@ class AnalisisSintactico:
                 siguienteValor = self.multiplicacionDivision()
                 validar, error = self.analisisSemantico.verificarNumero(siguienteValor)
                 if not validar:
-                    print(error)
+                    self.errores.append(error)
+                    #print(error)
                     return None
                 result -= siguienteValor
         return result
@@ -109,7 +125,8 @@ class AnalisisSintactico:
                 siguienteValor = self.asignarParentesis()
                 validar, error = self.analisisSemantico.verificarNumero(siguienteValor)
                 if not validar:
-                    print(error)
+                    self.errores.append(error)
+                    #print(error)
                     return None
                 result *= siguienteValor
 
@@ -119,7 +136,8 @@ class AnalisisSintactico:
                 siguienteValor = self.asignarParentesis()
                 validar, error = self.analisisSemantico.verificarNumero(siguienteValor)
                 if not validar:
-                    print(error)
+                    self.errores.append(error)
+                    #print(error)
                     return None
                 result /= siguienteValor
                 #result /= self.asignarParentesis()
@@ -160,11 +178,13 @@ class AnalisisSintactico:
             self.consumirToken('ID')
             validar, error=self.analisisSemantico.verificarDeclaracion(nombreVariable)
             if not validar:
-                print(error)
+                self.errores.append(error)
+                #print(error)
                 return None
             return self.variables[nombreVariable]
         else:
-            print('Token inesperado al asignar valor -> Linea: {self.linea}')
+            self.errores.append(f'Token inesperado al asignar valor -> Linea: {self.linea}')
+            #print(f'Token inesperado al asignar valor -> Linea: {self.linea}')
             return None
     
     def sintaxis_Funcion_Imprimir(self):
@@ -176,7 +196,7 @@ class AnalisisSintactico:
          self.consumirToken('FIN_LINEA')
          if ID in self.variables:
           valor = self.variables[ID]
-          print(f"-> {valor}")
+          print(f"Salida-> {valor}")
 
     def sintaxis_funcion_Numero_Aleatorio(self):
         self.consumirToken('LLAMAR_NUM_ALEATORIO')
@@ -211,24 +231,33 @@ class AnalisisSintactico:
 
 #FIN DECLARACIONES DE VARIABLES
 
-prueba = """num n = (90 + 20 - 10) / 2 * 2:
-num n2 = n + n*2:
-sim n3 = 'm':
-$IMPRIMIR (n2):
-"""
+# prueba = """num n = (90 + 20 - 10) / 2 * 2:
+# num n2 = n:
+# $IMPRIMIR(n):
+# sim n3 = 'm':
+# """
 # # 
 # # 
 # # """
 
+# def compilar():
+#     le=lex()
+#     le.tokenizar(prueba)
+#     aS=AnalisisSintactico(le.tokens)
+#     aS.procesarTokens()
+#     while aS.tokenActual:
+        
+#         aS.declararTipoDato()
+#         if not aS.tokenActual:  # Si no hay más tokens, salir del bucle
+#             break
+#     for e in aS.errores:
+#         print(e)
 
-# le=lex()
-# le.tokenizar(prueba)
-# aS=AnalisisSintactico(le.tokens)
-# aS.procesarTokens()
-# while aS.tokenActual:
-#     aS.declararTipoDato()
-#     if not aS.tokenActual:  # Si no hay más tokens, salir del bucle
-#         break
+#     if len(aS.errores)==0:
+#             print("Compilación exitosa")
+#     else: print("Error al compilar")
+
+#compilar()
 
 # for v in aS.variables:
 #     print("VARIABLE: ",v)

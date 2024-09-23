@@ -1,5 +1,5 @@
-from lexico import AnalisisLexico as lex
-from semantico import AnalisisSemantico as sem
+from .semantico import AnalisisSemantico as sem
+#from lexico import AnalisisLexico as lex
 import random
 
 class AnalisisSintactico:
@@ -216,19 +216,19 @@ num n2 = n + n*2:
 sim n3 = 'm':
 $IMPRIMIR (n2):
 """
-# 
-# 
-# """
+# # 
+# # 
+# # """
 
 
-le=lex()
-le.tokenizar(prueba)
-aS=AnalisisSintactico(le.tokens)
-aS.procesarTokens()
-while aS.tokenActual:
-    aS.declararTipoDato()
-    if not aS.tokenActual:  # Si no hay más tokens, salir del bucle
-        break
+# le=lex()
+# le.tokenizar(prueba)
+# aS=AnalisisSintactico(le.tokens)
+# aS.procesarTokens()
+# while aS.tokenActual:
+#     aS.declararTipoDato()
+#     if not aS.tokenActual:  # Si no hay más tokens, salir del bucle
+#         break
 
 # for v in aS.variables:
 #     print("VARIABLE: ",v)

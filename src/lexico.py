@@ -75,22 +75,10 @@ class AnalisisLexico:
                     self.insert(token_type, token_value)    
                 pos += len(token_value)  
             else:
-                print(f"Error léxico: Carácter no reconocido: {tex[pos]}")
+                #print(f"Error léxico: Carácter no reconocido: {tex[pos]}")
                 pos += 1 
        
 
-# prueba= """num n = "verdadero":
-# num n2 = 20:
-# sim m = 'ca':
-# $IMPRIMIR(36):
-# $CONCATENAR("Hola" "Mundo"):
-# """
-
-# # print(splitFinal(prueba))
-# lexico = AnalisisLexico()
-# lexico.tokenizar(prueba)
-# for token in lexico.tokens:
-#     print("TOKENS DE LA CADENA: ",token)
 
 
 

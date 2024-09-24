@@ -1,4 +1,5 @@
 from .semantico import AnalisisSemantico as sem
+from .funciones import Funciones as fn
 #from lexico import AnalisisLexico as lex
 import random
 
@@ -7,6 +8,7 @@ class AnalisisSintactico:
         self.tokens = tokens
         self.pos=0
         self.variables = {}
+        self.funciones=[]
         self.errores=[]
         self.linea=1
         self.tokenActual= tokens[0] if tokens else None
@@ -23,7 +25,7 @@ class AnalisisSintactico:
                 self.tokenActual = None
         else:
             self.errores.append(f"Error sintáctico: Se esperaba {token}, pero se encontró {self.tokenActual} -> Linea: {self.linea}")
-            #print(f"Error sintáctico: Se esperaba {token}, pero se encontró {self.tokenActual} -> Linea: {self.linea}")
+ 
            
 
 
@@ -33,61 +35,66 @@ class AnalisisSintactico:
         if self.tokenActual[0] in ['NUM', 'SIM', 'CADENA', 'BOOL']:
             self.declaraciones()
         else:
-            self.errores.append(f"Error sintáctico: Declaración inesperada en {self.tokenActual} -> Linea: {self.linea}")
-            #print(f"Error sintáctico: Declaración inesperada en {self.tokenActual} -> Linea: {self.linea}")
+            self.errores.append(f"Error sintáctico: Declaración inesperada, se esperaba un tipo de dato válido -> Linea: {self.linea}")
             self.tokenActual = None
 
-        
-
-
+    
     def declaraciones(self):
+        tipoDato = self.tokenActual[0]         
+        self.consumirToken(tipoDato)
+
+        #VERIFICAR QUE HAYA UN NOMBRE DE VARIABLE
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Token actual es None, se esperaba un nombre de variable.")
+            return
         
-        tipo = self.tokenActual[0]
-        self.consumirToken(tipo)
+        #VERIFICAR QUE EL NOMBRE DE VARIABLE NO SE HAYA DECLARADO
         nombreVariable = self.tokenActual[1]
         if nombreVariable in self.variables:
             self.errores.append(f"variable {nombreVariable} ya antes declarada")
-            #print(f"variable {nombreVariable} ya antes declarada")
             self.tokenActual = None
             return
+        
         self.consumirToken('ID')
+
+        #VERIFICAR QUE HAYA UNA ASIGNACIÓN
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Token actual es None, se esperaba asignacion de variable.")
+            return
         self.consumirToken('ASIGNAR')
 
-        if tipo =="NUM":
+        #VERIFICAR QUE HAYA UN VALOR PARA LA VARIABLE
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Token actual es None, se esperaba un valor.")
+            return
+        elif tipoDato =="NUM":
             valorExpresion = self.expresionesAritm()
-            #print("valor numero: ",valorExpresion)
         else:
             valorExpresion=self.analizarVariables()
 
 #VERIFICAR QUE LAS VARIABLES TENGAN EL TIPO DE DATO CORRECTO
         self.analisisSemantico.linea=self.linea
-        validar,error=self.analisisSemantico.verificarCompatibilidad(tipo,valorExpresion)
+        validar,error=self.analisisSemantico.verificarCompatibilidad(tipoDato,valorExpresion)
 
         if validar:
             self.variables[nombreVariable] = valorExpresion
-            #self.errores.append(f"Declaración de {tipo} {nombreVariable} = {valorExpresion}")
             if self.modoCompilacion:
-                print(f"Declaración de {tipo} {nombreVariable} = {valorExpresion}")
+                print(f"Declaración de {tipoDato} {nombreVariable} = {valorExpresion}")
         else:
             self.errores.append(error)
-            #print(error)
 
         if self.tokenActual and self.tokenActual[0] == 'FIN_LINEA':
             self.consumirToken('FIN_LINEA')
             self.linea+=1
         else:
-            self.errores.append(f"Error sintáctico: Se esperaba 'FIN_LINEA' pero se encontró {self.tokenActual} -> Linea: {self.linea}")
-            #print(f"Error sintáctico: Se esperaba 'FIN_LINEA' pero se encontró {self.tokenActual} -> Linea: {self.linea}")
+            self.errores.append(f"Error sintáctico: Se esperaba FIN_LINEA = ':' pero se encontró {self.tokenActual} -> Linea: {self.linea}")
+       
       
 
 
 #EXPRESIONES ARITMETICAS PARA ASIGNAR NUMEROS
     def expresionesAritm(self):
         result = self.multiplicacionDivision()
-        # validar, error = self.analisisSemantico.verificarNumero(result)
-        # if not validar:
-        #     print(error)
-        #     return None
         
         while self.tokenActual and self.tokenActual[0] in ['SUMA', 'RESTA']:
             token = self.tokenActual
@@ -97,7 +104,6 @@ class AnalisisSintactico:
                 validar, error = self.analisisSemantico.verificarNumero(siguienteValor)
                 if not validar:
                     self.errores.append(error)
-                    #print(error)
                     return None
                 result += siguienteValor
             elif token[0] == 'RESTA':
@@ -106,17 +112,12 @@ class AnalisisSintactico:
                 validar, error = self.analisisSemantico.verificarNumero(siguienteValor)
                 if not validar:
                     self.errores.append(error)
-                    #print(error)
                     return None
                 result -= siguienteValor
         return result
 
     def multiplicacionDivision(self):
         result = self.asignarParentesis()
-        # validar, error = self.analisisSemantico.verificarNumero(result)
-        # if not validar:
-        #     print(error)
-        #     return None
         
         while self.tokenActual and self.tokenActual[0] in ['MULT', 'DIV']:
             token = self.tokenActual
@@ -126,21 +127,17 @@ class AnalisisSintactico:
                 validar, error = self.analisisSemantico.verificarNumero(siguienteValor)
                 if not validar:
                     self.errores.append(error)
-                    #print(error)
                     return None
                 result *= siguienteValor
 
-                #result *= self.asignarParentesis()
             elif token[0] == 'DIV':
                 self.consumirToken('DIV')
                 siguienteValor = self.asignarParentesis()
                 validar, error = self.analisisSemantico.verificarNumero(siguienteValor)
                 if not validar:
                     self.errores.append(error)
-                    #print(error)
                     return None
                 result /= siguienteValor
-                #result /= self.asignarParentesis()
         return result
     
 
@@ -179,14 +176,14 @@ class AnalisisSintactico:
             validar, error=self.analisisSemantico.verificarDeclaracion(nombreVariable)
             if not validar:
                 self.errores.append(error)
-                #print(error)
                 return None
             return self.variables[nombreVariable]
         else:
             self.errores.append(f'Token inesperado al asignar valor -> Linea: {self.linea}')
-            #print(f'Token inesperado al asignar valor -> Linea: {self.linea}')
             return None
     
+
+
     def sintaxis_Funcion_Imprimir(self):
          self.consumirToken('LLAMAR_IMPRIMIR')
          self.consumirToken('PARENTESIS_I')
@@ -201,32 +198,47 @@ class AnalisisSintactico:
     def sintaxis_funcion_Numero_Aleatorio(self):
         self.consumirToken('LLAMAR_NUM_ALEATORIO')
         self.consumirToken('PARENTESIS_I')
-        rango1 = self.analizarVariables() 
+        # if self.tokenActual[0]=='NUMERO'
+        rangoInicial = self.analizarVariables()
+       # self.consumirToken('NUMERO')
         self.consumirToken('SEPARADOR')  
-        rangoFinal = self.analizarVariables()  
+        rangoFinal = self.analizarVariables() 
+        #self.consumirToken('NUMERO')
         self.consumirToken('PARENTESIS_D')  
         self.consumirToken('FIN_LINEA')
-        if isinstance(rango1, (int, float)) and isinstance(rangoFinal, (int, float)):
-         ranNum = random.randint(int(rango1), int(rangoFinal))
-         print(f"rand -> {ranNum}")
-        else:
-         print(f"error al generar número aleatorio: rangos inválidos")
 
-    def definirComando(self):
-       token = self.tokenActual 
-       if token[0] == 'LLAMAR_IMPRIMIR':
+        validacion,error=self.analisisSemantico.verificarNumero(rangoInicial)
+        if not validacion: self.errores.append(error)
+        validacion,error=self.analisisSemantico.verificarNumero(rangoFinal)
+        if not validacion: self.errores.append(error)
+
+        self.funciones.append(('numeroAleatorio',fn.numeroAleatorio(rangoInicial,rangoFinal)))
+    
+
+    def definirFuncion(self):
+       if self.tokenActual[0] == 'LLAMAR_IMPRIMIR':
           self.sintaxis_Funcion_Imprimir()
+
        elif self.tokenActual[0] == 'LLAMAR_NUM_ALEATORIO':
-           self.sintaxis_funcion_Numero_Aleatorio
+           self.sintaxis_funcion_Numero_Aleatorio()
+
        #elif FUNCION OPTENER FECHA ACTUAL, DANIEL
        else:
             print(f"Error sintáctico: Comando inesperado {self.tokenActual}")
 
     def procesarTokens(self):
      while self.tokenActual:
+
         if self.tokenActual[0] in ['LLAMAR_IMPRIMIR', 'LLAMAR_NUM_ALEATORIO']:
-           self.definirComando()
+           self.definirFuncion()
         else:
-           self.declararTipoDato() 
+           self.declararTipoDato()
+        
+
+    def limpiarEstado(self):
+        self.funciones.clear()
+        self.errores.clear()
+        self.tokenActual = None
+        self.pos=0
 
 #FIN DECLARACIONES DE VARIABLES

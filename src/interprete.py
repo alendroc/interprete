@@ -18,18 +18,19 @@ def compilar(codigo):
             #print("Compilación exitosa")
     else: 
         mensaje.append("Error al compilar")
-        #print("Error al compilar")
-    return mensaje,analisisSintactico
+    return "\n".join(mensaje),analisisSintactico
 
 
 def ejecutar(codigo):
         mensaje,analisisSintac=compilar(codigo)
+        resultado=[]
         if not analisisSintac.errores:
             if hasattr(analisisSintac, 'funciones'):
                 for funcion in analisisSintac.funciones:
                     nombre_funcion, valor = funcion
-                    mensaje.pop()
-                    mensaje.append(f"Función: {nombre_funcion}, Valor: {valor}")
+                    
+                    resultado.append(f"\nFunción: {nombre_funcion}, Valor: {valor}")
+        else:
+            resultado=mensaje.split("\n")
         
-
-        return mensaje
+        return "\n".join(resultado)

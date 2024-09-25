@@ -12,12 +12,13 @@ class Funciones:
     def imprimir(valor):
         print(valor)
     
+    #3-OBTENER FECHA ACTUAL
     @staticmethod
     def fechaActual():
         return date.today()
 
     #3-CONCATENAR CADENAS ALE
-    #4-OBTENER FECHA ACTUAL ALE
+    
     #5-CONTAR VOCALES DE UNA CADENA JOSUE
     #6-POTENCIA DE NUMERO JOSUE
     #7-MOSTRAR SINTAXIS DE FUNCIONES JOSUE

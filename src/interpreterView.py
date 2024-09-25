@@ -1,5 +1,6 @@
 from tkinter import *
 from .interprete import *
+from tkinter import ttk
 # from tkinter import ttk, filedialog
 
 class InterpreterView:
@@ -7,6 +8,8 @@ class InterpreterView:
         self.mainWd = Tk()
         self.mainWd.geometry("700x800")
         self.mainFr = Frame(self.mainWd)
+        # Llamar a la creación de estilos
+        self.create_button_style()
 
         # Frame del menú que contendrá optionsFr y debuggerFr
         self.menuFr = Frame(self.mainFr)
@@ -38,9 +41,9 @@ class InterpreterView:
         # Separador simulado entre codeFr y consoleFr
         self.separatorFr = Frame(self.mainFr, bg="#b0b0b0", height=2)
 
-        # Botones Run y Stop
-        self.ejecBtn = Button(self.debuggerFr, text="Ejecutar", command=self.onEjecEvent)
-        self.compBtn = Button(self.debuggerFr, text="Compilar", command=self.onCompileEvent)
+      # Botones Ejecutar y Compilar con el estilo creado
+        self.ejecBtn = ttk.Button(self.debuggerFr, text="Ejecutar", style="Custom.TButton", command=self.onEjecEvent)
+        self.compBtn = ttk.Button(self.debuggerFr, text="Compilar", style="Custom.TButton", command=self.onCompileEvent)
 
         # Posicionamiento
         self.setup_ui()
@@ -52,6 +55,24 @@ class InterpreterView:
         # Ejecución
         self.mainWd.bind('<Configure>', self.resize)
         self.mainWd.mainloop()
+
+
+    def create_button_style(self):
+        
+        style = ttk.Style()
+        style.configure("Custom.TButton", 
+                        font=("Times New Roman", 10),       # Fuente y tamaño de texto
+                        padding=10,              # Espacio interno
+                        foreground="#ffffff",    # Color del texto
+                        background="#98F5F9",    # Color de fondo (botón normal)
+                        borderwidth=0,           # Quitar borde
+                        focuscolor="none")       # Color al enfocarse
+
+        # Ajustar el color al pasar el ratón (hover)
+        style.map("Custom.TButton", 
+                  foreground=[("active", "#DCC332")],  # Color del texto al pasar el ratón
+                  background=[("active", "#DCC332")])  # Color de fondo al pasar el ratón
+
 
     def update_line_numbers(self, event=None):
         line_numbers_content = "\n".join(str(i) for i in range(1, int(self.codeTxt.index('end').split('.')[0])))

@@ -11,6 +11,11 @@ class InterpreterView:
         self.menuFr = Frame(self.mainFr)
 
         self.optionsFr = Frame(self.menuFr, bg="#dddddd", height=30)
+        
+        self.optionsFr.pack(fill=X) 
+        self.centered_label = Label(self.optionsFr, text="Intérprete Yakuza", bg="#dddddd", font=("Arial", 16), fg="#000000")  
+        self.centered_label.pack(expand=True)
+
         self.debuggerFr = Frame(self.menuFr, bg="white", height=30)
 
         # Frames dinámicos
@@ -18,7 +23,7 @@ class InterpreterView:
         self.consoleFr = Frame(self.mainFr, bg="#f0f0f0")
 
         # Text y Scrollbar del código y los números de línea
-        self.line_number = Text(self.codeFr, width=4, padx=4, takefocus=0, border=0, background='#527E60', state=DISABLED)
+        self.line_number = Text(self.codeFr, width=4, padx=4, takefocus=0, border=0, background='#DFC57B', state=DISABLED)
         self.codeTxt = Text(self.codeFr, wrap='none')  
         self.scrollbar = Scrollbar(self.codeFr, command=self.on_scroll)
         self.codeTxt.config(yscrollcommand=self.scrollbar.set)
@@ -58,11 +63,14 @@ class InterpreterView:
         """ Sincronizar el scrollbar para ambos Text widgets. """
         self.codeTxt.yview(*args)
         self.line_number.yview(*args)
-        self.scrollbar.set(*args)
 
     def sync_scroll(self, event=None):
         """ Sincronizar el desplazamiento al usar la rueda del mouse. """
-        self.on_scroll('scroll', event.delta, 'units')
+        # Usar yview_scroll para mover la vista cuando se use la rueda del mouse
+        self.codeTxt.yview_scroll(-1 * int(event.delta / 120), "units")
+        self.line_number.yview_scroll(-1 * int(event.delta / 120), "units")
+        return "break"
+
 
     def onEjecEvent(self):
         print("Ejecutar")
@@ -78,7 +86,7 @@ class InterpreterView:
             pass
 
     def setup_ui(self):
-        self.mainWd.title("Frame principal")
+        self.mainWd.title("Interpretador Yakuza")
         self.mainFr.pack(fill=BOTH, expand=True)
 
         # Menu estático
@@ -126,14 +134,16 @@ class InterpreterView:
         # Simplemente va cambiar al contrario
         current_bg = self.codeFr.cget("bg")
         if current_bg == "#f0f0f0":
+            self.line_number.config(bg="#CC6CE7")
             self.codeFr.config(bg="#2e2e2e")
             self.consoleFr.config(bg="#2e2e2e")
             self.codeTxt.config(bg="#1e1e1e", fg="white")
             self.consoleTxt.config(bg="#1e1e1e", fg="white")
         else:
+            self.line_number.config(bg="#E6DCE8")
             self.codeFr.config(bg="#f0f0f0")
             self.consoleFr.config(bg="#f0f0f0")
-            self.codeTxt.config(bg="white", fg="black")
+            self.codeTxt.config(bg="white")
             self.consoleTxt.config(bg="white", fg="black")
 
     

@@ -102,8 +102,26 @@ class InterpreterView:
         self.optionsFr.pack(fill=X)
         self.debuggerFr.pack(fill=X)  
 
-        # Crear el navbar
-        self.create_navbar()
+        # Crear el navbar directamente aquí
+        self.menu_bar = Menu(self.mainWd)
+        
+        # Crear menú Opciones, Nosotros y Vista
+        self.options_menu = Menu(self.menu_bar, tearoff=0)
+        self.vista_menu = Menu(self.menu_bar, tearoff=0)
+        self.nosotros_menu = Menu(self.menu_bar, tearoff=0)
+
+        # Poner todas las opciones que tendrá
+        self.options_menu.add_command(label="Guardar")
+        self.options_menu.add_command(label="Guardar como...")
+        self.vista_menu.add_command(label="Cambiar Tema", command=self.cambiarTema)
+        
+        # Añadir el menú "Opciones", "Vista" y "Sobre Nosotros" a la barra de menú
+        self.menu_bar.add_cascade(label="Opciones", menu=self.options_menu)
+        self.menu_bar.add_cascade(label="Vista", menu=self.vista_menu)
+        self.menu_bar.add_cascade(label="Sobre Nosotros")
+
+        # Configurar la barra de menú en la ventana principal
+        self.mainWd.config(menu=self.menu_bar)
 
         # Añadir componentes
         self.line_number.grid(column=0, row=0, padx=10, pady=10, sticky='ns')
@@ -117,26 +135,6 @@ class InterpreterView:
         self.ejecBtn.pack(side=RIGHT, anchor="e", padx=[5, 5])
         self.compBtn.pack(side=RIGHT, anchor="e", padx=[5, 5])
 
-    #AQUI INICIA EL NAVBAR
-    def create_navbar(self):
-        # Crear barra de menú
-        self.menu_bar = Menu(self.mainWd)
-        
-        # Crear menú Opciones, Nosostros y Vista
-        self.options_menu = Menu(self.menu_bar, tearoff=0)
-        self.vista_menu = Menu(self.menu_bar, tearoff=0)
-        self.nosotros_menu = Menu(self.menu_bar, tearoff=0)
-        # Poner todas las opciones que tendrá
-        self.options_menu.add_command(label="Guardar")
-        self.options_menu.add_command(label="Guardar como...")
-        self.vista_menu.add_command(label="Cambiar Tema", command=self.cambiarTema)
-       
-        # Añadir el menú "Opciones" a la barra de menú
-        self.menu_bar.add_cascade(label="Opciones", menu=self.options_menu)
-        self.menu_bar.add_cascade(label="Vista", menu=self.vista_menu)
-        self.menu_bar.add_cascade(label="Sobre Nosotros")
-        # Configurar la barra de menú en la ventana principal
-        self.mainWd.config(menu=self.menu_bar)
 
     def cambiarTema(self):
         # Simplemente va cambiar al contrario

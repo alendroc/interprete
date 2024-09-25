@@ -197,22 +197,51 @@ class AnalisisSintactico:
 
     def sintaxis_funcion_Numero_Aleatorio(self):
         self.consumirToken('LLAMAR_NUM_ALEATORIO')
+
+        if self.tokenActual is None or self.tokenActual[0] != 'PARENTESIS_I':
+            self.errores.append("Error sintáctico: Se esperaba 'PARENTESIS_I'")
+            return
         self.consumirToken('PARENTESIS_I')
-        # if self.tokenActual[0]=='NUMERO'
-        rangoInicial = self.analizarVariables()
-       # self.consumirToken('NUMERO')
-        self.consumirToken('SEPARADOR')  
-        rangoFinal = self.analizarVariables() 
-        #self.consumirToken('NUMERO')
-        self.consumirToken('PARENTESIS_D')  
+
+        if self.tokenActual is None :
+            self.errores.append("Error sintáctico: Se esperaba 'NUMERO'")
+            return
+        rangoInicial = self.expresionesAritm()
+        validacion, error = self.analisisSemantico.verificarNumero(rangoInicial)
+        if not validacion:
+            self.errores.append(f"Rango inicial inválido: {error}")
+            return
+        
+        if self.tokenActual is None or self.tokenActual[0] != 'SEPARADOR':
+            self.errores.append("Error sintáctico: Se esperaba un 'SEPARADOR'")
+            return
+        self.consumirToken('SEPARADOR')
+
+        if self.tokenActual is None :
+            self.errores.append("Error sintáctico: Se esperaba 'NUMERO'")
+            return
+        rangoFinal = self.expresionesAritm()
+        validacion, error = self.analisisSemantico.verificarNumero(rangoFinal)
+        if not validacion:
+            self.errores.append(f"Rango final inválido: {error}")
+            return
+        
+        if self.tokenActual is None or self.tokenActual[0] != 'PARENTESIS_D':
+            self.errores.append("Error sintáctico: Se esperaba 'PARENTESIS_D'")
+            return
+        self.consumirToken('PARENTESIS_D')
+
+        if self.tokenActual is None or self.tokenActual[0] != 'FIN_LINEA':
+            self.errores.append("Error sintáctico: Se esperaba 'FIN_LINEA'")
+            return  
         self.consumirToken('FIN_LINEA')
 
-        validacion,error=self.analisisSemantico.verificarNumero(rangoInicial)
-        if not validacion: self.errores.append(error)
-        validacion,error=self.analisisSemantico.verificarNumero(rangoFinal)
-        if not validacion: self.errores.append(error)
-
-        self.funciones.append(('numeroAleatorio',fn.numeroAleatorio(rangoInicial,rangoFinal)))
+        if rangoFinal < rangoInicial:
+            self.errores.append(f"Error semántico: El rango final ({rangoFinal}) no puede ser menor que el rango inicial ({rangoInicial}).")
+            return
+    
+        if not self.errores:
+            self.funciones.append(('numeroAleatorio',fn.numeroAleatorio(rangoInicial,rangoFinal)))
     
 
     def definirFuncion(self):
@@ -234,11 +263,5 @@ class AnalisisSintactico:
         else:
            self.declararTipoDato()
         
-
-    def limpiarEstado(self):
-        self.funciones.clear()
-        self.errores.clear()
-        self.tokenActual = None
-        self.pos=0
 
 #FIN DECLARACIONES DE VARIABLES

@@ -40,11 +40,11 @@ keywords = {
     'ID': r'[a-zA-Z_][a-zA-Z0-9_]*',  # Identificadores
     'SEPARADOR': r'[,]',
     'LLAMAR_IMPRIMIR': r'\$IMPRIMIR', 
-    'LLAMAR_CONCATENAR_CADENAS': r'\$CONCATENAR',
     'LLAMAR_NUM_ALEATORIO': r'\$ALEATORIO',
     'LLAMAR_OBTENER_FECHA_ACTUAL': r'\$OBTENER_FECHA',
     'LLAMAR_CONTAR_VOCALES': r'\$CONT_VOCALES',  
-    'LLAMAR_PONTENCIA': r'\$POTENCIA'
+    'LLAMAR_PONTENCIA': r'\$POTENCIA',
+    'LLAMAR_LONGITUD_CADENA': r'\$LONGITUD', 
     }
 
 

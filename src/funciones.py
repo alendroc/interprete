@@ -1,5 +1,5 @@
 import random
-
+from datetime import date
 class Funciones:
 
     # 1-OBTENER NUMERO ALEATORIO
@@ -11,6 +11,10 @@ class Funciones:
     @staticmethod
     def imprimir(valor):
         print(valor)
+    
+    @staticmethod
+    def fechaActual():
+        return date.today()
 
     #3-CONCATENAR CADENAS ALE
     #4-OBTENER FECHA ACTUAL ALE

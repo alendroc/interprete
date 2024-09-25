@@ -3,6 +3,7 @@ from .funciones import Funciones as fn
 #from lexico import AnalisisLexico as lex
 import random
 
+
 class AnalisisSintactico:
     def __init__(self,tokens):
         self.tokens = tokens
@@ -195,13 +196,37 @@ class AnalisisSintactico:
           valor = self.variables[ID]
           print(f"Salida-> {valor}")
 
-    def sintaxis_funcion_Numero_Aleatorio(self):
-        self.consumirToken('LLAMAR_NUM_ALEATORIO')
-
-        if self.tokenActual is None or self.tokenActual[0] != 'PARENTESIS_I':
+# SINTAXIS DE FUNCIONES PARA OPTIMIZAR
+    def parentesis_Izq(self):
+      if self.tokenActual is None or self.tokenActual[0] != 'PARENTESIS_I':
             self.errores.append("Error sintáctico: Se esperaba 'PARENTESIS_I'")
             return
-        self.consumirToken('PARENTESIS_I')
+      self.consumirToken('PARENTESIS_I')
+     
+    def parentesis_Der(self):
+      if self.tokenActual is None or self.tokenActual[0] != 'PARENTESIS_D':
+            self.errores.append("Error sintáctico: Se esperaba 'PARENTESIS_D'")
+            return
+      self.consumirToken('PARENTESIS_D')
+
+    def dos_puntos_final(self):
+        if self.tokenActual is None or self.tokenActual[0] != 'FIN_LINEA':
+            self.errores.append("Error sintáctico: Se esperaba 'FIN_LINEA'")
+            return  
+        self.consumirToken('FIN_LINEA')
+
+    def coma(self):
+        if self.tokenActual is None or self.tokenActual[0] != 'SEPARADOR':
+            self.errores.append("Error sintáctico: Se esperaba un 'SEPARADOR'")
+            return
+        self.consumirToken('SEPARADOR')
+#fin de recursos para una funcion
+
+#Funciones del sistema-----------------------------
+
+    def sintaxis_funcion_Numero_Aleatorio(self):
+        self.consumirToken('LLAMAR_NUM_ALEATORIO')
+        self.parentesis_Izq()
 
         if self.tokenActual is None :
             self.errores.append("Error sintáctico: Se esperaba 'NUMERO'")
@@ -212,10 +237,7 @@ class AnalisisSintactico:
             self.errores.append(f"Rango inicial inválido: {error}")
             return
         
-        if self.tokenActual is None or self.tokenActual[0] != 'SEPARADOR':
-            self.errores.append("Error sintáctico: Se esperaba un 'SEPARADOR'")
-            return
-        self.consumirToken('SEPARADOR')
+        self.coma()
 
         if self.tokenActual is None :
             self.errores.append("Error sintáctico: Se esperaba 'NUMERO'")
@@ -226,39 +248,38 @@ class AnalisisSintactico:
             self.errores.append(f"Rango final inválido: {error}")
             return
         
-        if self.tokenActual is None or self.tokenActual[0] != 'PARENTESIS_D':
-            self.errores.append("Error sintáctico: Se esperaba 'PARENTESIS_D'")
-            return
-        self.consumirToken('PARENTESIS_D')
-
-        if self.tokenActual is None or self.tokenActual[0] != 'FIN_LINEA':
-            self.errores.append("Error sintáctico: Se esperaba 'FIN_LINEA'")
-            return  
-        self.consumirToken('FIN_LINEA')
+        self.parentesis_Der()
+        self.dos_puntos_final()
 
         if rangoFinal < rangoInicial:
-            self.errores.append(f"Error semántico: El rango final ({rangoFinal}) no puede ser menor que el rango inicial ({rangoInicial}).")
-            return
-    
+            self.errores.append(f"Error semántico: El rango final ({rangoFinal}) no puede ser menor que el rango inicial ({rangoInicial}).\n")
+            return 
         if not self.errores:
             self.funciones.append(('numeroAleatorio',fn.numeroAleatorio(rangoInicial,rangoFinal)))
-    
+
+#Fecha actua:
+    def sintaxis_funcion_Obtener_Fecha_Actual(self):
+        self.consumirToken('LLAMAR_OBTENER_FECHA_ACTUAL')
+        self.parentesis_Izq()
+        self.parentesis_Der()
+        self.dos_puntos_final()
+        self.funciones.append(('FechaActual',fn.fechaActual())) 
+#-----
 
     def definirFuncion(self):
        if self.tokenActual[0] == 'LLAMAR_IMPRIMIR':
           self.sintaxis_Funcion_Imprimir()
-
        elif self.tokenActual[0] == 'LLAMAR_NUM_ALEATORIO':
            self.sintaxis_funcion_Numero_Aleatorio()
-
+       elif self.tokenActual[0] == 'LLAMAR_OBTENER_FECHA_ACTUAL':
+            self.sintaxis_funcion_Obtener_Fecha_Actual()
        #elif FUNCION OPTENER FECHA ACTUAL, DANIEL
        else:
             print(f"Error sintáctico: Comando inesperado {self.tokenActual}")
 
     def procesarTokens(self):
      while self.tokenActual:
-
-        if self.tokenActual[0] in ['LLAMAR_IMPRIMIR', 'LLAMAR_NUM_ALEATORIO']:
+        if self.tokenActual[0] in ['LLAMAR_IMPRIMIR', 'LLAMAR_NUM_ALEATORIO','LLAMAR_OBTENER_FECHA_ACTUAL']:
            self.definirFuncion()
         else:
            self.declararTipoDato()

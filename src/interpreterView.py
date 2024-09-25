@@ -1,5 +1,6 @@
 from tkinter import *
-from tkinter import ttk, filedialog
+from .interprete import *
+# from tkinter import ttk, filedialog
 
 class InterpreterView:
     def __init__(self):
@@ -60,27 +61,34 @@ class InterpreterView:
         self.line_number.config(state=DISABLED)
 
     def on_scroll(self, *args):
-        """ Sincronizar el scrollbar para ambos Text widgets. """
         self.codeTxt.yview(*args)
         self.line_number.yview(*args)
 
     def sync_scroll(self, event=None):
-        """ Sincronizar el desplazamiento al usar la rueda del mouse. """
-        # Usar yview_scroll para mover la vista cuando se use la rueda del mouse
         self.codeTxt.yview_scroll(-1 * int(event.delta / 120), "units")
         self.line_number.yview_scroll(-1 * int(event.delta / 120), "units")
         return "break"
 
 
     def onEjecEvent(self):
-        print("Ejecutar")
+        try:
+            self.consoleTxt.config(state=NORMAL)
+            codigoEntrada = self.codeTxt.get("1.0", END)
+            self.consoleTxt.delete(1.0, END)
+            self.consoleTxt.insert(1.0, ejecutar(codigoEntrada))
+            self.consoleTxt.config(state=DISABLED)
+
+        except TclError:
+            pass
+
 
     def onCompileEvent(self):
         try:
             self.consoleTxt.config(state=NORMAL)
             codigoEntrada = self.codeTxt.get("1.0", END)
             self.consoleTxt.delete(1.0, END)
-            self.consoleTxt.insert(1.0, compilar(codigoEntrada))
+            mensaje,analisisSintac=compilar(codigoEntrada)
+            self.consoleTxt.insert(1.0, mensaje)
             self.consoleTxt.config(state=DISABLED)
         except TclError:
             pass

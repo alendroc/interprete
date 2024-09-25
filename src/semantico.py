@@ -32,7 +32,6 @@ class AnalisisSemantico:
         return True,None
 
 
-
     def verificarDeclaracion(self, nombreVariable):
         if nombreVariable not in self.variables:
             return False, f"Error semántico: La variable '{nombreVariable}' no ha sido declarada -> Linea: {self.linea}"

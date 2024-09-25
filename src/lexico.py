@@ -40,11 +40,11 @@ keywords = {
     'ID': r'[a-zA-Z_][a-zA-Z0-9_]*',  # Identificadores
     'SEPARADOR': r'[,]',
     'LLAMAR_IMPRIMIR': r'\$IMPRIMIR', 
-    'LLAMAR_CONCATENAR_CADENAS': r'\$CONCATENAR',
     'LLAMAR_NUM_ALEATORIO': r'\$ALEATORIO',
     'LLAMAR_OBTENER_FECHA_ACTUAL': r'\$OBTENER_FECHA',
     'LLAMAR_CONTAR_VOCALES': r'\$CONT_VOCALES',  
-    'LLAMAR_PONTENCIA': r'\$POTENCIA'
+    'LLAMAR_PONTENCIA': r'\$POTENCIA',
+    'LLAMAR_LONGITUD_CADENA': r'\$LONGITUD', 
     }
 
 
@@ -75,22 +75,10 @@ class AnalisisLexico:
                     self.insert(token_type, token_value)    
                 pos += len(token_value)  
             else:
-                print(f"Error léxico: Carácter no reconocido: {tex[pos]}")
+                #print(f"Error léxico: Carácter no reconocido: {tex[pos]}")
                 pos += 1 
        
 
-# prueba= """num n = "verdadero":
-# num n2 = 20:
-# sim m = 'ca':
-# $IMPRIMIR(36):
-# $CONCATENAR("Hola" "Mundo"):
-# """
-
-# # print(splitFinal(prueba))
-# lexico = AnalisisLexico()
-# lexico.tokenizar(prueba)
-# for token in lexico.tokens:
-#     print("TOKENS DE LA CADENA: ",token)
 
 
 

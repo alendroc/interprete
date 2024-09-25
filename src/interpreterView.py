@@ -149,7 +149,7 @@ class InterpreterView:
             self.line_number.config(bg="#E6DCE8")
             self.codeFr.config(bg="#f0f0f0")
             self.consoleFr.config(bg="#f0f0f0")
-            self.codeTxt.config(bg="white")
+            self.codeTxt.config(bg="white",fg="black")
             self.consoleTxt.config(bg="white", fg="black")
 
     

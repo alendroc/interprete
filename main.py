@@ -15,9 +15,5 @@ def main():
     #codigo=compilar(vista.codeTxt.get())
     vista.onCompileEvent()
     
-    
-
 if __name__ == "__main__":
     main()
-
-

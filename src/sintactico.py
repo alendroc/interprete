@@ -95,7 +95,16 @@ class AnalisisSintactico:
 
 #EXPRESIONES ARITMETICAS PARA ASIGNAR NUMEROS
     def expresionesAritm(self):
+        #USAR NUMEROS NEGATIVOS
+        negativo = False
+        if self.tokenActual and self.tokenActual[0] == 'RESTA':
+            self.consumirToken('RESTA')
+            negativo = True
+        
         result = self.multiplicacionDivision()
+        
+        if negativo:
+            result = -result
         
         while self.tokenActual and self.tokenActual[0] in ['SUMA', 'RESTA']:
             token = self.tokenActual
@@ -116,6 +125,7 @@ class AnalisisSintactico:
                     return None
                 result -= siguienteValor
         return result
+
 
     def multiplicacionDivision(self):
         result = self.asignarParentesis()
@@ -184,32 +194,20 @@ class AnalisisSintactico:
             return None
     
 
-
-    def sintaxis_Funcion_Imprimir(self):
-         self.consumirToken('LLAMAR_IMPRIMIR')
-         self.consumirToken('PARENTESIS_I')
-         ID =self.tokenActual[1]
-         self.consumirToken('ID')
-         self.consumirToken('PARENTESIS_D')
-         self.consumirToken('FIN_LINEA')
-         if ID in self.variables:
-          valor = self.variables[ID]
-          print(f"Salida-> {valor}")
-
 # SINTAXIS DE FUNCIONES PARA OPTIMIZAR
-    def parentesis_Izq(self):
+    def parentesisIzq(self):
       if self.tokenActual is None or self.tokenActual[0] != 'PARENTESIS_I':
             self.errores.append("Error sintáctico: Se esperaba 'PARENTESIS_I'")
             return
       self.consumirToken('PARENTESIS_I')
      
-    def parentesis_Der(self):
+    def parentesisDer(self):
       if self.tokenActual is None or self.tokenActual[0] != 'PARENTESIS_D':
             self.errores.append("Error sintáctico: Se esperaba 'PARENTESIS_D'")
             return
       self.consumirToken('PARENTESIS_D')
 
-    def dos_puntos_final(self):
+    def dosPuntosFinal(self):
         if self.tokenActual is None or self.tokenActual[0] != 'FIN_LINEA':
             self.errores.append("Error sintáctico: Se esperaba 'FIN_LINEA'")
             return  
@@ -223,10 +221,10 @@ class AnalisisSintactico:
 #fin de recursos para una funcion
 
 #Funciones del sistema-----------------------------
-
-    def sintaxis_funcion_Numero_Aleatorio(self):
+#OBTENER NUMERO ALEATORIO DE UN RANGO DADO
+    def sintaxisFuncionNumeroAleatorio(self):
         self.consumirToken('LLAMAR_NUM_ALEATORIO')
-        self.parentesis_Izq()
+        self.parentesisIzq()
 
         if self.tokenActual is None :
             self.errores.append("Error sintáctico: Se esperaba 'NUMERO'")
@@ -248,8 +246,8 @@ class AnalisisSintactico:
             self.errores.append(f"Rango final inválido: {error}")
             return
         
-        self.parentesis_Der()
-        self.dos_puntos_final()
+        self.parentesisDer()
+        self.dosPuntosFinal()
 
         if rangoFinal < rangoInicial:
             self.errores.append(f"Error semántico: El rango final ({rangoFinal}) no puede ser menor que el rango inicial ({rangoInicial}).\n")
@@ -257,29 +255,172 @@ class AnalisisSintactico:
         if not self.errores:
             self.funciones.append(('numeroAleatorio',fn.numeroAleatorio(rangoInicial,rangoFinal)))
 
-#Fecha actua:
-    def sintaxis_funcion_Obtener_Fecha_Actual(self):
+#IMPRIME EL VALOR QUE SE PONGA O VARIABLES DEFINIDAS
+    def sintaxisFuncionImprimir(self):
+        self.consumirToken('LLAMAR_IMPRIMIR')
+        self.parentesisIzq()
+
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Se esperaba un valor para imprimir.")
+            return
+        valor=self.expresionesAritm()
+        self.parentesisDer()
+        self.dosPuntosFinal()
+        self.funciones.append(('imprimir',fn.imprimir(valor)))
+
+
+#OBTENER FECHA ACTUAL
+    def sintaxisFuncionObtenerFechaActual(self):
         self.consumirToken('LLAMAR_OBTENER_FECHA_ACTUAL')
-        self.parentesis_Izq()
-        self.parentesis_Der()
-        self.dos_puntos_final()
-        self.funciones.append(('FechaActual',fn.fechaActual())) 
+        self.parentesisIzq()
+        self.parentesisDer()
+        self.dosPuntosFinal()
+        self.funciones.append(('FechaActual',fn.fechaActual()))
+
+#OBTENER SINTAXIS DE LAS DECLARACIONES DE VARIABLES
+    def sintaxisFuncionObtenerDeclaraciones(self):
+        self.consumirToken('LLAMAR_SINTAXIS_DECLARACIONES')
+        self.parentesisIzq()
+        self.parentesisDer()
+        self.dosPuntosFinal()
+        self.funciones.append(('declaracionesVariables',fn.mostrarSintaxisDecl()))
+
+#OBTENER SINTAXIS DE LAS DECLARACIONES DE FUNCIONES
+    def sintaxisFuncionObtenerFunciones(self):
+        self.consumirToken('LLAMAR_SINTAXIS_FUNCIONES')
+        self.parentesisIzq()
+        self.parentesisDer()
+        self.dosPuntosFinal()
+        self.funciones.append(('funcionesLocales',fn.mostrarSintaxisFunc()))
+
+#OBTENER LA CANTIDAD DE VOCALES DE UN TEXTO
+    def sintaxisFuncionContarVocales(self):
+        self.consumirToken('LLAMAR_CONTAR_VOCALES')
+        self.parentesisIzq()
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Se esperaba un valor para contar vocales.")
+            return
+        
+        valor=self.analizarVariables()
+        validar,error=self.analisisSemantico.verificarCadena(valor)
+        if not validar:
+            self.errores.append(error)
+            return
+
+        self.parentesisDer()
+        self.dosPuntosFinal()
+        self.funciones.append(('contarVocales',fn.contarVocales(valor)))
+
+#OBTENER POTENCIA DE UN NUMERO
+    def sintaxisFuncionPotencia(self):
+        self.consumirToken('LLAMAR_POTENCIA')
+        self.parentesisIzq()
+
+        if self.tokenActual is None :
+            self.errores.append("Error sintáctico: Se esperaba 'NUMERO'")
+            return
+        numBase = self.expresionesAritm()
+        validacion, error = self.analisisSemantico.verificarNumero(numBase)
+        if not validacion:
+            self.errores.append(error)
+            return
+        
+        self.coma()
+
+        if self.tokenActual is None :
+            self.errores.append("Error sintáctico: Se esperaba 'NUMERO'")
+            return
+        numPow = self.expresionesAritm()
+        validacion, error = self.analisisSemantico.verificarNumero(numPow)
+        if not validacion:
+            self.errores.append(error)
+            return
+        
+        self.parentesisDer()
+        self.dosPuntosFinal()
+
+        if not self.errores:
+            self.funciones.append(('potenciaNumero',fn.potencia(numBase,numPow)))
+
+
+    def sintaxisLongitudCadena(self):
+        self.consumirToken('LLAMAR_LONGITUD_CADENA')
+        self.parentesisIzq()
+
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Se esperaba un valor para extraer la longitud de la cadena.")
+            return
+        
+        valor=self.analizarVariables()
+        validar,error=self.analisisSemantico.verificarCadena(valor)
+        if not validar:
+            self.errores.append(error)
+            return
+
+        self.parentesisDer()
+        self.dosPuntosFinal()
+        self.funciones.append(('extraerLongitud',fn.longitudTexto(valor)))
+
+    def sintaxisConcatenarCadenas(self):
+        self.consumirToken('LLAMAR_SINTAXIS_CONCATENAR_CADENAS')
+        self.parentesisIzq()
+        
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Se esperaba un valor para la cadena.")
+            return
+        
+        valor1=self.analizarVariables()
+        validar,error=self.analisisSemantico.verificarCadena(valor1)
+        if not validar:
+            self.errores.append(error)
+            return
+        
+        self.coma()
+
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Se esperaba un valor para la cadena.")
+            return
+        
+        valor2=self.analizarVariables()
+        validar,error=self.analisisSemantico.verificarCadena(valor2)
+        if not validar:
+            self.errores.append(error)
+            return
+
+
+        self.parentesisDer()
+        self.dosPuntosFinal()
+        self.funciones.append(('concatenarCadenas',fn.concatenarTexto(valor1,valor2)))
+
 #-----
 
     def definirFuncion(self):
        if self.tokenActual[0] == 'LLAMAR_IMPRIMIR':
-          self.sintaxis_Funcion_Imprimir()
+          self.sintaxisFuncionImprimir()
        elif self.tokenActual[0] == 'LLAMAR_NUM_ALEATORIO':
-           self.sintaxis_funcion_Numero_Aleatorio()
+           self.sintaxisFuncionNumeroAleatorio()
        elif self.tokenActual[0] == 'LLAMAR_OBTENER_FECHA_ACTUAL':
-            self.sintaxis_funcion_Obtener_Fecha_Actual()
-       #elif FUNCION OPTENER FECHA ACTUAL, DANIEL
+            self.sintaxisFuncionObtenerFechaActual()
+       elif self.tokenActual[0]=='LLAMAR_SINTAXIS_DECLARACIONES':
+           self.sintaxisFuncionObtenerDeclaraciones()
+       elif self.tokenActual[0]=='LLAMAR_CONTAR_VOCALES':
+           self.sintaxisFuncionContarVocales()
+       elif self.tokenActual[0]=='LLAMAR_POTENCIA':
+           self.sintaxisFuncionPotencia()
+       elif self.tokenActual[0]=='LLAMAR_LONGITUD_CADENA':
+           self.sintaxisLongitudCadena()
+       elif self.tokenActual[0]=='LLAMAR_SINTAXIS_CONCATENAR_CADENAS':
+           self.sintaxisConcatenarCadenas()
+       elif self.tokenActual[0]=='LLAMAR_SINTAXIS_FUNCIONES':
+           self.sintaxisFuncionObtenerFunciones()
        else:
             print(f"Error sintáctico: Comando inesperado {self.tokenActual}")
 
     def procesarTokens(self):
      while self.tokenActual:
-        if self.tokenActual[0] in ['LLAMAR_IMPRIMIR', 'LLAMAR_NUM_ALEATORIO','LLAMAR_OBTENER_FECHA_ACTUAL']:
+        if self.tokenActual[0] in ['LLAMAR_IMPRIMIR', 'LLAMAR_NUM_ALEATORIO','LLAMAR_OBTENER_FECHA_ACTUAL',
+                                   'LLAMAR_SINTAXIS_DECLARACIONES','LLAMAR_CONTAR_VOCALES','LLAMAR_POTENCIA',
+                                   'LLAMAR_LONGITUD_CADENA','LLAMAR_SINTAXIS_CONCATENAR_CADENAS','LLAMAR_SINTAXIS_FUNCIONES']:
            self.definirFuncion()
         else:
            self.declararTipoDato()

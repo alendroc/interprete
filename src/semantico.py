@@ -30,7 +30,11 @@ class AnalisisSemantico:
         if not isinstance(valor, (int, float)):
             return False,f"Error semántico: Se esperaba un número, pero se encontró '{valor}' -> Linea: {self.linea}"
         return True,None
-
+    
+    def verificarCadena(self, valor):
+        if not isinstance(valor, str):
+            return False,f"Error semántico: Se esperaba una cadena, pero se encontró '{valor}' -> Linea: {self.linea}"
+        return True,None
 
     def verificarDeclaracion(self, nombreVariable):
         if nombreVariable not in self.variables:

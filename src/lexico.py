@@ -1,11 +1,10 @@
 import re
 
 keywords = {
-    'NUM': r'\bnum\b',               # Declaración de entero
-    #'DEC': r'\bdec\b',               # Declaración de float
+    'NUM': r'\bnum\b',               # Declaración de numerico
     'SIM': r'\bsim\b',               # Declaración de char
     'BOOL': r'\bbool\b',             # Declaración de booleano
-    'NULO': r'\bnulo\b',             # Declaración de valor nulo
+    #'NULO': r'\bnulo\b',             # Declaración de valor nulo
     'CADENA': r'\bcadena\b',         # Declaración de string
     'Y':r'\b\&{2}\b|\&{2}',          #Operador and
     'O':r'\b\|{2}\b|\|{2}',          #Operador or
@@ -39,12 +38,17 @@ keywords = {
     'SALTO_LINEA': r'\n',           #salto de linea
     'ID': r'[a-zA-Z_][a-zA-Z0-9_]*',  # Identificadores
     'SEPARADOR': r'[,]',
-    'LLAMAR_IMPRIMIR': r'\$IMPRIMIR', 
+
     'LLAMAR_NUM_ALEATORIO': r'\$ALEATORIO',
+    'LLAMAR_IMPRIMIR': r'\$IMPRIMIR', 
     'LLAMAR_OBTENER_FECHA_ACTUAL': r'\$OBTENER_FECHA',
     'LLAMAR_CONTAR_VOCALES': r'\$CONT_VOCALES',  
-    'LLAMAR_PONTENCIA': r'\$POTENCIA',
+    'LLAMAR_POTENCIA': r'\$POTENCIA',
     'LLAMAR_LONGITUD_CADENA': r'\$LONGITUD', 
+    'LLAMAR_SINTAXIS_DECLARACIONES': r'\$DECLARACIONES',
+    'LLAMAR_SINTAXIS_FUNCIONES': r'\$FUNCIONES',
+    'LLAMAR_SINTAXIS_CONCATENAR_CADENAS': r'\$CONCATENAR'
+
     }
 
 

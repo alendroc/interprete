@@ -1,10 +1,15 @@
 from tkinter import *
 from .interprete import *
-from tkinter import ttk
+from tkinter import ttk, filedialog
 # from tkinter import ttk, filedialog
 
 class InterpreterView:
     def __init__(self):
+        # Variable para almacenar la ruta del archivo actual
+        self.current_file = None
+        
+        self.tittle = "Interpretador Yakuza"
+        
         self.mainWd = Tk()
         self.mainWd.geometry("700x800")
         self.mainFr = Frame(self.mainWd)
@@ -115,7 +120,7 @@ class InterpreterView:
             pass
 
     def setup_ui(self):
-        self.mainWd.title("Interpretador Yakuza")
+        self.mainWd.title(self.tittle)
         self.mainFr.pack(fill=BOTH, expand=True)
 
         # Menu estático
@@ -132,8 +137,10 @@ class InterpreterView:
         self.nosotros_menu = Menu(self.menu_bar, tearoff=0)
 
         # Poner todas las opciones que tendrá
-        self.options_menu.add_command(label="Guardar")
-        self.options_menu.add_command(label="Guardar como...")
+        self.options_menu.add_command(label="Nuevo archivo", command=self.nuevo_archivo)
+        self.options_menu.add_command(label="Abrir archivo", command=self.abrir_archivo)
+        self.options_menu.add_command(label="Guardar", command=self.guardar)
+        self.options_menu.add_command(label="Guardar como...", command=self.guardar_como)
         self.vista_menu.add_command(label="Cambiar Tema", command=self.cambiarTema)
         
         # Añadir el menú "Opciones", "Vista" y "Sobre Nosotros" a la barra de menú
@@ -173,7 +180,48 @@ class InterpreterView:
             self.codeTxt.config(bg="white",fg="black")
             self.consoleTxt.config(bg="white", fg="black")
 
-    
+    def nuevo_archivo(self):
+        self.current_file = None
+        self.codeTxt.delete("1.0", END)
+        self.update_line_numbers()
+        self.mainWd.title(self.tittle)
+
+    def abrir_archivo(self):
+        file_path = filedialog.askopenfilename(
+        title="Abrir archivo", 
+        filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+        )
+        if file_path:
+            self.current_file = file_path
+            
+            with open(self.current_file, 'r') as file:
+                text = file.read()
+                self.codeTxt.delete("1.0", END)
+                self.codeTxt.insert("1.0", text)
+                self.update_line_numbers()
+                self.mainWd.title(file_path)
+        else:
+            self.guardar_como()   
+
+    def guardar(self):
+        if self.current_file:
+            with open(self.current_file, 'w') as file:
+                file.write(self.codeTxt.get("1.0", END))
+        else:
+            self.guardar_como()
+
+    def guardar_como(self):
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+        )
+        if file_path:
+            self.current_file = file_path
+            with open(self.current_file, 'w') as file:
+                file.write(self.codeTxt.get("1.0", END))
+                self.mainWd.title(file_path)
+                
+                 
     #Funciones de guardar 
     #def guardar(self):
         

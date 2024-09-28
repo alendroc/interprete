@@ -342,8 +342,8 @@ class AnalisisSintactico:
         if not self.errores:
             self.funciones.append(('potenciaNumero',fn.potencia(numBase,numPow)))
 
-
-    def sintaxisLongitudCadena(self):
+#OBTENER LA LONGITUD DE UN TEXTO
+    def sintaxisFuncionLongitudCadena(self):
         self.consumirToken('LLAMAR_LONGITUD_CADENA')
         self.parentesisIzq()
 
@@ -361,7 +361,8 @@ class AnalisisSintactico:
         self.dosPuntosFinal()
         self.funciones.append(('extraerLongitud',fn.longitudTexto(valor)))
 
-    def sintaxisConcatenarCadenas(self):
+#CONCATENAR 2 CADENAS
+    def sintaxisFuncionConcatenarCadenas(self):
         self.consumirToken('LLAMAR_SINTAXIS_CONCATENAR_CADENAS')
         self.parentesisIzq()
         
@@ -392,6 +393,135 @@ class AnalisisSintactico:
         self.dosPuntosFinal()
         self.funciones.append(('concatenarCadenas',fn.concatenarTexto(valor1,valor2)))
 
+#VERIFICAR SI UN NUMERO ES PAR
+    def sintaxisFuncionVerificarNumeroPar(self):
+        self.consumirToken('LLAMAR_SINTAXIS_ES_PAR')
+        self.parentesisIzq()
+
+        if self.tokenActual is None :
+            self.errores.append("Error sintáctico: Se esperaba 'NUMERO'")
+            return
+        numBase = self.expresionesAritm()
+        validacion, error = self.analisisSemantico.verificarNumero(numBase)
+        if not validacion:
+            self.errores.append(error)
+            return
+        
+        self.parentesisDer()
+        self.dosPuntosFinal()
+
+        if not self.errores:
+            self.funciones.append(('numeroPar',fn.esPar(numBase)))
+
+#CONVERTIR CADENA A MINUSCULA
+    def sintaxisFuncionConvertirMinus(self):
+        self.consumirToken('LLAMAR_SINTAXIS_CADENA_MINUSCULA')
+        self.parentesisIzq()
+        
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Se esperaba un valor para la cadena.")
+            return
+        
+        valor1=self.analizarVariables()
+        validar,error=self.analisisSemantico.verificarCadena(valor1)
+        if not validar:
+            self.errores.append(error)
+            return
+
+
+        self.parentesisDer()
+        self.dosPuntosFinal()
+        self.funciones.append(('convertirMinuscula',fn.convertirMinus(valor1)))
+
+
+#CONVERTIR CADENA A MAYUSCULA
+    def sintaxisFuncionConvertirMayus(self):
+        self.consumirToken('LLAMAR_SINTAXIS_CADENA_MAYUSCULA')
+        self.parentesisIzq()
+        
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Se esperaba un valor para la cadena.")
+            return
+        
+        valor1=self.analizarVariables()
+        validar,error=self.analisisSemantico.verificarCadena(valor1)
+        if not validar:
+            self.errores.append(error)
+            return
+
+
+        self.parentesisDer()
+        self.dosPuntosFinal()
+        self.funciones.append(('convertirMayuscula',fn.convertirMayus(valor1)))
+
+
+#OBTENER SUBCADENA DE CADENA POR RANGOS DE INDICES
+    def sintaxisFuncionObtenerSubcadena(self):
+        self.consumirToken('LLAMAR_SINTAXIS_OBTENER_SUBCADENA')
+        self.parentesisIzq()
+
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Se esperaba un valor para la cadena.")
+            return
+
+        texto = self.analizarVariables()
+        validar, error = self.analisisSemantico.verificarCadena(texto)
+        if not validar:
+            self.errores.append(error)
+            return
+
+        self.coma()
+
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Se esperaba 'NUMERO' para el rango inicial.")
+            return
+        rangoInicio = self.expresionesAritm()
+        if rangoInicio is None:
+            self.errores.append("Error semántico: Se esperaba un número para el rango inicial, pero no se proporcionó.")
+            return
+
+        try:
+            rangoInicio = int(rangoInicio)
+            validacion, error = self.analisisSemantico.verificarNumero(rangoInicio)
+            if not validacion:
+                self.errores.append(error)
+                return
+        except ValueError:
+            self.errores.append(f"Error semántico: Se esperaba un número entero para el rango inicial, pero se encontró '{rangoInicio}'.")
+            return
+
+        self.coma()
+
+        if self.tokenActual is None:
+            self.errores.append("Error sintáctico: Se esperaba 'NUMERO' para el rango final.")
+            return
+        rangoFinal = self.expresionesAritm()
+        if rangoFinal is None:
+            self.errores.append("Error semántico: Se esperaba un número para el rango final, pero no se proporcionó.")
+            return
+
+        try:
+            rangoFinal = int(rangoFinal)
+            validacion, error = self.analisisSemantico.verificarNumero(rangoFinal)
+            if not validacion:
+                self.errores.append(error)
+                return
+        except ValueError:
+            self.errores.append(f"Error semántico: Se esperaba un número entero para el rango final, pero se encontró '{rangoFinal}'.")
+            return
+
+        self.parentesisDer()
+        self.dosPuntosFinal()
+
+        if rangoInicio < 0 or rangoFinal > len(texto):
+            self.errores.append(f"Error semántico: Los rangos deben estar entre 0 y {len(texto)}.")
+            return
+        if  rangoInicio>rangoFinal:
+            self.errores.append(f"Error semántico: El rango final debe ser mayor a {rangoInicio}")
+            return
+
+        self.funciones.append(('obtenerSubcadena', fn.obtenerSubCadena(texto, rangoInicio, rangoFinal)))
+
 #-----
 
     def definirFuncion(self):
@@ -408,11 +538,19 @@ class AnalisisSintactico:
        elif self.tokenActual[0]=='LLAMAR_POTENCIA':
            self.sintaxisFuncionPotencia()
        elif self.tokenActual[0]=='LLAMAR_LONGITUD_CADENA':
-           self.sintaxisLongitudCadena()
+           self.sintaxisFuncionLongitudCadena()
        elif self.tokenActual[0]=='LLAMAR_SINTAXIS_CONCATENAR_CADENAS':
-           self.sintaxisConcatenarCadenas()
+           self.sintaxisFuncionConcatenarCadenas()
        elif self.tokenActual[0]=='LLAMAR_SINTAXIS_FUNCIONES':
            self.sintaxisFuncionObtenerFunciones()
+       elif self.tokenActual[0]=='LLAMAR_SINTAXIS_ES_PAR':
+           self.sintaxisFuncionVerificarNumeroPar()
+       elif self.tokenActual[0]=='LLAMAR_SINTAXIS_CADENA_MINUSCULA':
+           self.sintaxisFuncionConvertirMinus()
+       elif self.tokenActual[0]=='LLAMAR_SINTAXIS_CADENA_MAYUSCULA':
+           self.sintaxisFuncionConvertirMayus()
+       elif self.tokenActual[0]=='LLAMAR_SINTAXIS_OBTENER_SUBCADENA':
+           self.sintaxisFuncionObtenerSubcadena()
        else:
             print(f"Error sintáctico: Comando inesperado {self.tokenActual}")
 
@@ -420,7 +558,9 @@ class AnalisisSintactico:
      while self.tokenActual:
         if self.tokenActual[0] in ['LLAMAR_IMPRIMIR', 'LLAMAR_NUM_ALEATORIO','LLAMAR_OBTENER_FECHA_ACTUAL',
                                    'LLAMAR_SINTAXIS_DECLARACIONES','LLAMAR_CONTAR_VOCALES','LLAMAR_POTENCIA',
-                                   'LLAMAR_LONGITUD_CADENA','LLAMAR_SINTAXIS_CONCATENAR_CADENAS','LLAMAR_SINTAXIS_FUNCIONES']:
+                                   'LLAMAR_LONGITUD_CADENA','LLAMAR_SINTAXIS_CONCATENAR_CADENAS','LLAMAR_SINTAXIS_FUNCIONES',
+                                   'LLAMAR_SINTAXIS_ES_PAR','LLAMAR_SINTAXIS_CADENA_MINUSCULA','LLAMAR_SINTAXIS_CADENA_MAYUSCULA',
+                                   'LLAMAR_SINTAXIS_OBTENER_SUBCADENA']:
            self.definirFuncion()
         else:
            self.declararTipoDato()

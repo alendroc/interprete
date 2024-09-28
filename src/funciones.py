@@ -68,5 +68,26 @@ class Funciones:
     \n'cadena': Declaración de string----> cadena n4 = "hola mundo":
 """
         )
+    
+    #10-DEMUESTRA SI EL NUMERO ES PAR
+    @staticmethod
+    def esPar(numero):
+        return True if numero%2==0 else False
+    
+    #11-CONVERTIR TEXTO A MINUSCULA
+    @staticmethod
+    def convertirMinus(texto):
+        return str.lower(texto)
+    
+    #12-CONVERTIR TEXTO A MAYUSCULA
+    @staticmethod
+    def convertirMayus(texto):
+        return str.upper(texto)
+    
+    #13-OBTENER SUBCADENA
+    @staticmethod
+    def obtenerSubCadena(texto,rangoInicio,rangoFinal):
+        return texto[rangoInicio:rangoFinal]
+    
 
     

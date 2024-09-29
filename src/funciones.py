@@ -53,6 +53,10 @@ class Funciones:
     \nCONCATENAR CADENAS                ----> $CONCATENAR("Hola ","mundo"):
     \nMOSTRAR SINTAXIS DE FUNCIONES     ----> $FUNCIONES():
     \nMOSTRAR SINTAXIS DE DECLARACIONES ----> $DECLARACIONES():
+    \nVALIDAR NUMERO PAR                ----> $PAR(2):
+    \nCONVERTIR TEXTO A MINUSCULA       ----> $MINUS("CONVIERTE ESTO EN MINUSCULA"):
+    \nCONVERTIR TEXTO A MAYUSCULA       ----> $MAYUS("convierte esto en mayuscula"):
+    \nOBTENER SUBCADENA DE TEXTO        ----> $SUBCADENA("obtiene subcadena",2,9):
 """
         )
 

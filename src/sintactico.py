@@ -36,7 +36,7 @@ class AnalisisSintactico:
         if self.tokenActual[0] in ['NUM', 'SIM', 'CADENA', 'BOOL']:
             self.declaraciones()
         else:
-            self.errores.append(f"Error sintáctico: Declaración inesperada, se esperaba un tipo de dato válido -> Linea: {self.linea}")
+            self.errores.append(f"Error sintáctico: Declaración inesperada, se esperaba un tipo de dato válido (num/sim/cadena/bool/$FUNCIONES..) -> Linea: {self.linea}")
             self.tokenActual = None
 
     
@@ -60,7 +60,7 @@ class AnalisisSintactico:
 
         #VERIFICAR QUE HAYA UNA ASIGNACIÓN
         if self.tokenActual is None:
-            self.errores.append("Error sintáctico: Token actual es None, se esperaba asignacion de variable.")
+            self.errores.append("Error sintáctico: Token actual es None, se esperaba asignacion de variable '='")
             return
         self.consumirToken('ASIGNAR')
 
@@ -88,7 +88,7 @@ class AnalisisSintactico:
             self.consumirToken('FIN_LINEA')
             self.linea+=1
         else:
-            self.errores.append(f"Error sintáctico: Se esperaba FIN_LINEA = ':' pero se encontró {self.tokenActual} -> Linea: {self.linea}")
+            self.errores.append(f"Error sintáctico: Se esperaba FIN_LINEA ':' pero se encontró {self.tokenActual} -> Linea: {self.linea}")
        
       
 
@@ -197,25 +197,25 @@ class AnalisisSintactico:
 # SINTAXIS DE FUNCIONES PARA OPTIMIZAR
     def parentesisIzq(self):
       if self.tokenActual is None or self.tokenActual[0] != 'PARENTESIS_I':
-            self.errores.append("Error sintáctico: Se esperaba 'PARENTESIS_I'")
+            self.errores.append("Error sintáctico: Se esperaba 'PARENTESIS_I' '('")
             return
       self.consumirToken('PARENTESIS_I')
      
     def parentesisDer(self):
       if self.tokenActual is None or self.tokenActual[0] != 'PARENTESIS_D':
-            self.errores.append("Error sintáctico: Se esperaba 'PARENTESIS_D'")
+            self.errores.append("Error sintáctico: Se esperaba 'PARENTESIS_D' ')'")
             return
       self.consumirToken('PARENTESIS_D')
 
     def dosPuntosFinal(self):
         if self.tokenActual is None or self.tokenActual[0] != 'FIN_LINEA':
-            self.errores.append("Error sintáctico: Se esperaba 'FIN_LINEA'")
+            self.errores.append("Error sintáctico: Se esperaba 'FIN_LINEA' ':'")
             return  
         self.consumirToken('FIN_LINEA')
 
     def coma(self):
         if self.tokenActual is None or self.tokenActual[0] != 'SEPARADOR':
-            self.errores.append("Error sintáctico: Se esperaba un 'SEPARADOR'")
+            self.errores.append("Error sintáctico: Se esperaba un 'SEPARADOR' ','")
             return
         self.consumirToken('SEPARADOR')
 #fin de recursos para una funcion

@@ -78,8 +78,8 @@ class InterpreterView:
 
         # Ajustar el color al pasar el ratón (hover)
         style.map("Custom.TButton", 
-                foreground=[("active", "#DCC332")],      # Color del texto al pasar el ratón
-                background=[("active", "#DCC332")])      # Color de fondo al pasar el ratón
+                foreground=[("active", "#8D6F64")],      # Color del texto al pasar el ratón
+                background=[("active", "#8D6F64")])      # Color de fondo al pasar el ratón
 
 
     def update_line_numbers(self, event=None):

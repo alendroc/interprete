@@ -32,7 +32,7 @@ class Funciones:
     #6-MOSTRAR LONGITUD DE CADENA
     @staticmethod
     def longitudTexto(texto):
-        return len(texto)-2
+        return len(texto)
     
     #7-CONCATENAR CADENAS
     @staticmethod

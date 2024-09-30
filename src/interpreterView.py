@@ -232,17 +232,18 @@ class InterpreterView:
         # Simplemente va cambiar al contrario
         current_bg = self.codeFr.cget("bg")
         if current_bg == "#f0f0f0":
-            #self.line_number.config(bg="#CC6CE7")
+            # Cambiar a tema oscuro
             self.codeFr.config(bg="#2e2e2e")
             self.consoleFr.config(bg="#2e2e2e")
-            self.codeTxt.config(bg="#1e1e1e", fg="white")
-            self.consoleTxt.config(bg="#1e1e1e", fg="white")
+            self.codeTxt.config(bg="#1e1e1e", fg="white", insertbackground="white")  # Cambiar cursor a blanco
+            self.consoleTxt.config(bg="#1e1e1e", fg="white", insertbackground="white")  # Cambiar cursor a blanco
         else:
-            #self.line_number.config(bg="#E6DCE8")
+            # Cambiar a tema claro
             self.codeFr.config(bg="#f0f0f0")
             self.consoleFr.config(bg="#f0f0f0")
-            self.codeTxt.config(bg="white",fg="black")
-            self.consoleTxt.config(bg="white", fg="black")
+            self.codeTxt.config(bg="white", fg="black", insertbackground="black")  # Cambiar cursor a negro
+            self.consoleTxt.config(bg="white", fg="black", insertbackground="black")  # Cambiar cursor a negro
+
 
     def nuevo_archivo(self):
         self.current_file = None
